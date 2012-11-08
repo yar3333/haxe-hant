@@ -4,3 +4,4 @@ library/ndll/Windows/*.ilk
 library/src/neko/*.ncb
 library/src/neko/*.suo
 library/src/neko/*.user
+library.zip
