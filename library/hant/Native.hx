@@ -1,8 +1,6 @@
 package hant;
 
-import haxe.io.Path;
 import neko.Lib;
-using StringTools;
 
 class Native
 {
