@@ -62,7 +62,7 @@ class Log
             : messages.get(level + 1) + " (" + message + ")";
     }
 	
-	public function print(message:String)
+	public function trace(message:String)
 	{
 		if (level < verboseLevel)
 		{

@@ -2,19 +2,27 @@ package hant;
 
 import haxe.io.Path;
 import neko.Lib;
+using StringTools;
 
 class Native
 {
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	
-	public static function copyFilePreservingAttributes(exeDir:String, src:String, dst:String) : Void
+	var ndll : String;
+	
+	public function new(ndll:String)
+	{
+		this.ndll = ndll;
+	}
+	
+	public function copyFilePreservingAttributes(src:String, dst:String) : Void
 	{
 		if (copy_file_preserving_attributes == null)
 		{
-			copy_file_preserving_attributes = Lib.load(exeDir + "haqnative-" + Sys.systemName().toLowerCase(), "copy_file_preserving_attributes", 2);
+			copy_file_preserving_attributes = Lib.load(ndll, "copy_file_preserving_attributes", 2);
 		}
 		
-		var r : Int = Lib.nekoToHaxe(copy_file_preserving_attributes(Lib.haxeToNeko(path2native(src)), Lib.haxeToNeko(path2native(dst))));
+		var r : Int = Lib.nekoToHaxe(copy_file_preserving_attributes(Lib.haxeToNeko(PathTools.path2native(src)), Lib.haxeToNeko(PathTools.path2native(dst))));
 		
 		if (r != 0)
 		{
@@ -42,10 +50,5 @@ class Native
 				throw "Error code is " + r + ".";
 			}
 		}
-	}
-	
-	static function path2native(s:String) : String
-	{
-		return Sys.systemName() != "Windows" ? s : StringTools.replace(s, "/", "\\");
 	}
 }
