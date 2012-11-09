@@ -3,7 +3,7 @@ package hant;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
-using haquery.StringTools;
+using StringTools;
 
 #if neko
 import neko.Lib;
@@ -13,13 +13,13 @@ import php.Lib;
 
 class Hant 
 {
-	var exeDir : String;
     var log : Log;
+	var native : Native;
     
-    public function new(exeDir:String, ?log:Log)
+    public function new(log:Log, ndll:String)
     {
-		this.exeDir = exeDir;
-        this.log = log != null ? log : new Log(0);
+        this.log = log;
+		this.native = new Native(ndll);
     }
     
     public function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool) : Void
@@ -57,7 +57,7 @@ class Hant
 			log.start("Create directory '" + path + "'");
 			try
 			{
-				path = path.replace('\\', '/');
+				path = PathTools.path2normal(path);
 				var dirs : Array<String> = path.split('/');
 				for (i in 0...dirs.length)
 				{
@@ -81,18 +81,27 @@ class Hant
     
     public function copyFolderContent(src:String, dest:String)
     {
-		src = src.replace('\\', '/').rtrim('/');
-        dest = dest.replace('\\', '/').rtrim('/');
+		src = PathTools.path2normal(src);
+        dest = PathTools.path2normal(dest);
 		
 		log.start("Copy directory '" + src + "' => '" + dest + "'");
         
 		findFiles(src, function(path)
 		{
-			HaqNative.copyFilePreservingAttributes(exeDir, path, dest + path.substr(src.length));
+			copyFile(path, dest + path.substr(src.length));
 		});
 		
 		log.finishOk();
     }
+	
+	public function copyFile(src:String, dest:String)
+	{
+		#if neko
+		native.copyFilePreservingAttributes(src, dest);
+		#else
+		File.copy(src, dest);
+		#end
+	}
     
 	public function rename(path:String, newpath:String)
     {
@@ -191,34 +200,6 @@ class Hant
 		}
 	}
 	
-	public function run(fileName:String, args:Array<String>) : { exitCode:Int, stdOut:String, stdErr:String }
-	{
-		var p = new Process(fileName.replace("/", "\\"), args);
-		
-		var stdOut = "";
-		try
-		{
-			while (true)
-			{
-				Sys.sleep(0.1);
-				stdOut += p.stdout.readLine() + "\n";
-			}
-		}
-		catch (e:haxe.io.Eof) {}
-		
-		var exitCode = p.exitCode();
-		var stdErr = p.stderr.readAll().toString().replace("\r\n", "\n");
-		p.close();
-		
-		if (exitCode != 0)
-		{
-			Lib.println(fileName.replace("/", "\\") + " " + args.join(" ") + " ");
-			Lib.println("Run error: " + exitCode);
-		}
-		
-		return { exitCode:exitCode, stdOut:stdOut, stdErr:stdErr };
-	}
-	
 	/*public function runCmd(fileName:String, args:Array<String>)
 	{
 		var env = Sys.environment();
@@ -294,7 +275,7 @@ class Hant
     
 	public function getHiddenFileAttribute(path:String) : Bool
 	{
-		if (Sys.systemName == "Windows")
+		if (Sys.systemName() == "Windows")
 		{
 			var p = new Process("attrib", [ path ]);
 			var s = p.stdout.readAll().toString();
@@ -309,7 +290,7 @@ class Hant
 	
 	public function setHiddenFileAttribute(path:String, hidden:Bool) : Void
 	{
-		if (Sys.systemName == "Windows")
+		if (Sys.systemName() == "Windows")
 		{
 			Sys.command("attrib", [ (hidden ? "+" : "-") + "H", path ]);
 		}
