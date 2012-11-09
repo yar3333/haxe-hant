@@ -29,7 +29,7 @@ class Log
         if (level < verboseLevel)
         {
             if (inBlock) println("");
-            print(indent(level) + message + ': ');
+            print(indent(level) + message + ": ");
             inBlock = true;
         }
         messages.set(level, message);
@@ -74,7 +74,7 @@ class Log
 	
     function indent(level:Int) : String
     {
-        return StringTools.rpad('', ' ', level * 2);
+        return StringTools.rpad("", " ", level * 2);
     }
 	
 	function print(s:String)

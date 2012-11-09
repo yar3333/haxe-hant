@@ -14,12 +14,18 @@ import php.Lib;
 class Hant 
 {
     var log : Log;
+
+	#if neko
 	var native : Native;
+	#end
     
-    public function new(log:Log, ndll:String)
+    public function new(log:Log, ?ndll:String)
     {
         this.log = log;
-		this.native = new Native(ndll);
+		
+		#if neko
+		this.native = ndll != null ? new Native(ndll) : null;
+		#end
     }
     
     public function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool) : Void
@@ -30,16 +36,19 @@ class Hant
 			{
 				for (file in FileSystem.readDirectory(path))
 				{
-					if (FileSystem.isDirectory(path + '/' + file))
+					if (FileSystem.isDirectory(path + "/" + file))
 					{
-						if (onDir == null || onDir(path + '/' + file))
+						if (file != ".svn" && file != ".hg" && file != ".git")
 						{
-							findFiles(path + '/' + file, onFile, onDir);
+							if (onDir == null || onDir(path + "/" + file))
+							{
+								findFiles(path + "/" + file, onFile, onDir);
+							}
 						}
 					}
 					else
 					{
-						if (onFile != null) onFile(path + '/' + file);
+						if (onFile != null) onFile(path + "/" + file);
 					}
 				}
 			}
@@ -58,11 +67,11 @@ class Hant
 			try
 			{
 				path = PathTools.path2normal(path);
-				var dirs : Array<String> = path.split('/');
+				var dirs : Array<String> = path.split("/");
 				for (i in 0...dirs.length)
 				{
-					var dir = dirs.slice(0, i + 1).join('/');
-					if (!dir.endsWith(':'))
+					var dir = dirs.slice(0, i + 1).join("/");
+					if (!dir.endsWith(":"))
 					{
 						if (!FileSystem.exists(dir))
 						{
@@ -97,7 +106,10 @@ class Hant
 	public function copyFile(src:String, dest:String)
 	{
 		#if neko
-		native.copyFilePreservingAttributes(src, dest);
+		if (native != null)
+		{
+			native.copyFilePreservingAttributes(src, dest);
+		}
 		#else
 		File.copy(src, dest);
 		#end
@@ -148,13 +160,13 @@ class Hant
 			{
 				for (file in FileSystem.readDirectory(path))
 				{
-					if (FileSystem.isDirectory(path + '/' + file))
+					if (FileSystem.isDirectory(path + "/" + file))
 					{
-						deleteDirectory(path + '/' + file);
+						deleteDirectory(path + "/" + file);
 					}
 					else
 					{
-						deleteFile(path + '/' + file);
+						deleteFile(path + "/" + file);
 					}
 				}
 
