@@ -6,17 +6,18 @@
 #else
 	#include <sys/stat.h>
 	#include <sys/time.h>
+	#include <sys/types.h>
 	#include <time.h>
+	#include <utime.h>
 	#include <fcntl.h>
 	#include <stdio.h>
-	#include <utime>
 	#include <ctime>
 	//#include <cstdio>    // fopen, fclose, fread, fwrite, BUFSIZ
 #endif
 
 #include <neko.h>
 
-int copyfiletimes(LPCSTR src, LPCSTR dst);
+int copyfiletimes(const char *src, const char *dst);
 
 value copy_file_preserving_attributes(value src, value dst)
 {	
@@ -64,7 +65,7 @@ DEFINE_PRIM(copy_file_preserving_attributes, 2);
 
 /**************************************************************************************/
 
-int copyfiletimes(LPCSTR src, LPCSTR dst)
+int copyfiletimes(const char *src, const char *dst)
 {
 	#if _WINDOWS
 
@@ -101,8 +102,8 @@ int copyfiletimes(LPCSTR src, LPCSTR dst)
 	
 	#else
 
-		stat srcAttrib;
-		utimbuf destTimes;
+		struct stat srcAttrib;
+		struct utimbuf destTimes;
 		// get source stat
 		if (stat(val_string(src), &srcAttrib) < 0)
 		{

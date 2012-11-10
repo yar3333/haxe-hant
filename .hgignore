@@ -6,3 +6,6 @@ library/src/neko/*.suo
 library/src/neko/*.user
 library.zip
 bin
+library/src/neko/Release
+library/ndll/Windows/*.pdb
+library/src/neko/*.o
