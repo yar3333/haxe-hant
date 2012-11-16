@@ -46,8 +46,8 @@
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />
-    <option testMovie="OpenDocument" />
-    <option testMovieCommand="http://htmlparser/" />
+    <option testMovie="Custom" />
+    <option testMovieCommand="cmd /K neko bin/index.n" />
   </options>
   <!-- Plugin storage -->
   <storage />
