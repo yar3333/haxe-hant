@@ -11,7 +11,7 @@ import neko.Lib;
 import php.Lib;
 #end
 
-class Hant 
+class FileSystemTools 
 {
     var log : Log;
 

@@ -47,7 +47,7 @@ class Log
         level--;
     }
     
-    public function finishFail(message:String)
+    public function finishFail(?exceptionToThrow:Dynamic)
     {
         if (level < verboseLevel)
         {
@@ -57,9 +57,11 @@ class Log
         }
         
         level--;
-        throw level + 1 < verboseLevel
-            ? message 
-            : messages.get(level + 1) + " (" + message + ")";
+		
+		if (exceptionToThrow != null)
+		{
+			throw exceptionToThrow;
+		}
     }
 	
 	public function trace(message:String)
@@ -67,7 +69,7 @@ class Log
 		if (level < verboseLevel)
 		{
 			if (inBlock) println("");
-			println(indent(level) + message);
+			println(indent(level + 1) + message);
 			inBlock = false;
 		}
 	}
