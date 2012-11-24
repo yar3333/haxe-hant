@@ -36,7 +36,17 @@ class FileSystemTools
 			{
 				for (file in FileSystem.readDirectory(path))
 				{
-					if (FileSystem.isDirectory(path + "/" + file))
+					var isDir : Bool = null;
+					try 
+					{
+						isDir = FileSystem.isDirectory(path + "/" + file);
+					}
+					catch (e:Dynamic) 
+					{
+						log.trace("ERROR: FileSystem.isDirectory('" + path + "/" + file + "')");
+					}
+					
+					if (isDir == true)
 					{
 						if (file != ".svn" && file != ".hg" && file != ".git")
 						{
@@ -47,6 +57,7 @@ class FileSystemTools
 						}
 					}
 					else
+					if (isDir == false)
 					{
 						if (onFile != null) onFile(path + "/" + file);
 					}
