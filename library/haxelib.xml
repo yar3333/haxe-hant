@@ -4,5 +4,5 @@
     <tag v='php'/>
     <tag v='neko'/>
     <description>Library with ant-like methods.</description>
-	<version name='1.2'>Added command line options parser (see CmdOptions class).</version>
+	<version name='1.2'>Command line options parser improvements.</version>
 </project>
