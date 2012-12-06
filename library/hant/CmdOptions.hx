@@ -1,16 +1,20 @@
 package hant;
 
+import Type;
+
 private typedef Option = 
 {
 	var name : String;
 	var defaultValue : Dynamic;
+	var type : ValueType;
 	var switches : Array<String>;
 	var help : String;
+	var repeatable : Bool;
 }
 
 /**
  * Usage example:
- * var parser = new CommandLineOptions();
+ * var parser = new CmdOptions();
  * parser.addOption('isRecursive', false, [ '-r', '--recursive']);
  * parser.addOption('count', 0, [ '-c', '--count']);
  * parser.addOption('file', 'bin');
@@ -22,9 +26,7 @@ class CmdOptions
 {
 	var options : Array<Option>;
 	var args : Array<String>;
-	
-	var paramWoSwitchesIndex : Int;
-	
+	var paramWoSwitchIndex : Int;
 	var params : Hash<Dynamic>;
 
 	public function new()
@@ -39,22 +41,56 @@ class CmdOptions
 	
 	public function add(name:String, defaultValue:Dynamic, ?switches:Array<String>, help="")
 	{
-		options.push({ name:name, defaultValue:defaultValue, switches:switches, help:help });
+		var type = Type.typeof(defaultValue);
+		if (type == ValueType.TNull) type = ValueType.TClass(String);
+		addInner(name, defaultValue, type, switches, help, false);
 	}
-
+	
+	public function addRepeatable(name:String, type:ValueType, ?switches:Array<String>, help="")
+	{
+		if (type != ValueType.TBool)
+		{
+			if (type == ValueType.TNull) type = ValueType.TClass(String);
+			addInner(name, [], type, switches, help, true);
+		}
+		else
+		{
+			throw "Type 'bool' can not be used for repeatable option '" + name + "'.";
+		}
+	}
+	
+	function addInner(name:String, defaultValue:Dynamic, type:ValueType, switches:Array<String>, help:String, repeatable:Bool)
+	{
+		if (!hasOption(name))
+		{
+			options.push( { name:name, defaultValue:defaultValue, type:type, switches:switches, help:help, repeatable:repeatable } );
+		}
+		else
+		{
+			throw "Option '" + name + "' already added.";
+		}
+	}
+	
 	public function getHelpMessage() : String
 	{
 		var s = "";
-		for (a in options)
+		for (opt in options)
 		{
-			s += a.switches.join(", ");
-			if (a.switches.length > 1)
+			if (opt.switches != null)
 			{
-				s += "\n";
+				s += opt.switches.join(", ");
+				if (opt.switches.length > 1)
+				{
+					s += "\n";
+				}
 			}
-			if (a.help != null) 
+			else
 			{
-				s += "\t" + a.help;
+				s += "<" + opt.name + ">";
+			}
+			if (opt.help != null) 
+			{
+				s += "\t" + opt.help;
 			}
 			s += "\n";
 		}
@@ -65,13 +101,13 @@ class CmdOptions
 	public function parse(args:Array<String>) : Hash<Dynamic>
 	{
 		this.args = args.copy();
+		paramWoSwitchIndex = 0;
 		
 		params = new Hash<Dynamic>();
 		for (opt in options)
 		{
 			params.set(opt.name, opt.defaultValue);
 		}
-		
 		
 		while (this.args.length > 0)
 		{
@@ -101,7 +137,7 @@ class CmdOptions
 					{
 						if (s == arg)
 						{
-							resolveSwitch(opt.name, arg, opt.defaultValue);
+							resolveSwitch(opt, arg);
 							return;
 						}
 					}
@@ -112,47 +148,42 @@ class CmdOptions
 		}
 		else
 		{
-			for (opt in options)
+			var opt = getNextNoSwitchOption();
+			if (opt != null)
 			{
-				if (opt.switches == null)
-				{
-					for (s in opt.switches)
-					{
-						if (s == arg)
-						{
-							resolveSwitch(opt.name, arg, opt.defaultValue);
-							return;
-						}
-					}
-				}
+				args.unshift(arg);
+				resolveSwitch(opt, arg);
+			}
+			else
+			{
+				throw "Unexpected argument '" + arg + "'.";
 			}
 		}
 	}
 
-	function resolveSwitch(name:String, s:String, defaultValue:Dynamic) : Void
+	function resolveSwitch(opt:Option, s:String) : Void
 	{
-		switch (Type.typeof(defaultValue))
+		switch (opt.type)
 		{
 			case ValueType.TInt:
 				ensureValueExist(s);
-				params.set(name, Std.parseInt(args.shift()));
+				if (!opt.repeatable) params.set(opt.name, Std.parseInt(args.shift()));
+				else                 params.get(opt.name).push(Std.parseInt(args.shift()));
 			
 			case ValueType.TFloat:
 				ensureValueExist(s);
-				params.set(name, Std.parseFloat(args.shift()));
+				if (!opt.repeatable) params.set(opt.name, Std.parseFloat(args.shift()));
+				else                 params.get(opt.name).push(Std.parseFloat(args.shift()));
 				
 			case ValueType.TBool:
-				params.set(name, !defaultValue);
-			
-			case ValueType.TNull:
-				ensureValueExist(s);
-				params.set(name, true);
+				params.set(opt.name, !opt.defaultValue);
 			
 			case ValueType.TClass(c):
 				if (c == String)
 				{
 					ensureValueExist(s);
-					params.set(name, args.shift());
+					if (!opt.repeatable) params.set(opt.name, args.shift());
+					else                 params.get(opt.name).push(args.shift());
 				}
 				else
 				{
@@ -160,8 +191,13 @@ class CmdOptions
 				}
 			
 			default:
-				throw "Option type '" + Type.typeof(defaultValue) + "' not supported.";
+				throw "Option type '" + opt.type + "' not supported.";
 		}
+	}
+	
+	function hasOption(name:String) : Bool
+	{
+		return Lambda.exists(options, function(opt) return opt.name == name);
 	}
 	
 	function ensureValueExist(s:String) : Void
@@ -170,5 +206,18 @@ class CmdOptions
 		{
 			throw "Missing value after '" + s + "' switch.";
 		}
+	}
+	
+	function getNextNoSwitchOption() : Option
+	{
+		for (i in paramWoSwitchIndex...options.length)
+		{
+			if (options[i].switches == null)
+			{
+				paramWoSwitchIndex = i + 1;
+				return options[i];
+			}
+		}
+		return null;
 	}
 }
