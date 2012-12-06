@@ -5,7 +5,7 @@ using StringTools;
 
 class Process extends sys.io.Process 
 {
-	public static function run(log:Log, fileName:String, args:Array<String>) : { exitCode:Int, stdOut:String, stdErr:String }
+	public static function run(log:Log, fileName:String, args:Array<String>, verbose=false) : { exitCode:Int, stdOut:String, stdErr:String }
 	{
 		var p = new Process(fileName, args);
 		
@@ -15,7 +15,9 @@ class Process extends sys.io.Process
 			while (true)
 			{
 				Sys.sleep(0.1);
-				stdOut += p.stdout.readLine() + "\n";
+				var s = p.stdout.readLine();
+				if (verbose) Lib.println(s);
+				stdOut += s + "\n";
 			}
 		}
 		catch (e:haxe.io.Eof) {}
