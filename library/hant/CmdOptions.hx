@@ -46,17 +46,17 @@ class CmdOptions
 		addInner(name, defaultValue, type, switches, help, false);
 	}
 	
-	public function addRepeatable(name:String, type:ValueType, ?switches:Array<String>, help="")
+	public function addRepeatable(name:String, clas:Class<Dynamic>, ?switches:Array<String>, help="")
 	{
-		if (type != ValueType.TBool)
+		var className = Type.getClassName(clas);
+		var type : ValueType = switch (className)
 		{
-			if (type == ValueType.TNull) type = ValueType.TClass(String);
-			addInner(name, [], type, switches, help, true);
+			case "String": ValueType.TClass(String);
+			case "Int": ValueType.TInt;
+			case "Float": ValueType.TFloat;
+			default: throw "Type '" + className + "' can not be used for repeatable option '" + name + "'.";
 		}
-		else
-		{
-			throw "Type 'bool' can not be used for repeatable option '" + name + "'.";
-		}
+		addInner(name, [], type, switches, help, true);
 	}
 	
 	function addInner(name:String, defaultValue:Dynamic, type:ValueType, switches:Array<String>, help:String, repeatable:Bool)
