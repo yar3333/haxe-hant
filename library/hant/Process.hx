@@ -5,7 +5,7 @@ using StringTools;
 
 class Process extends sys.io.Process 
 {
-	public static function run(log:Log, fileName:String, args:Array<String>, verbose=false) : { exitCode:Int, stdOut:String, stdErr:String }
+	public static function run(?log:Log, fileName:String, args:Array<String>, verbose=false) : { exitCode:Int, stdOut:String, stdErr:String }
 	{
 		var p = new Process(fileName, args);
 		
@@ -28,8 +28,11 @@ class Process extends sys.io.Process
 		
 		if (exitCode != 0)
 		{
-			log.trace(fileName.replace("/", "\\") + " " + args.join(" ") + " ");
-			log.trace("Run error: " + exitCode);
+			if (log != null)
+			{
+				log.trace(fileName.replace("/", "\\") + " " + args.join(" ") + " ");
+				log.trace("Run error: " + exitCode);
+			}
 		}
 		
 		return { exitCode:exitCode, stdOut:stdOut, stdErr:stdErr };
