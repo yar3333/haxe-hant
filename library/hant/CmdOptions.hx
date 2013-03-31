@@ -1,6 +1,8 @@
 package hant;
 
 import Type;
+import stdlib.Std;
+using stdlib.StringTools;
 
 private typedef Option = 
 {
@@ -71,30 +73,44 @@ class CmdOptions
 		}
 	}
 	
-	public function getHelpMessage() : String
+	public function getHelpMessage(prefix="\t") : String
 	{
-		var s = "";
+		var maxSwitchLength = 0;
 		for (opt in options)
 		{
 			if (opt.switches != null)
 			{
-				s += opt.switches.join(", ");
-				if (opt.switches.length > 1)
-				{
-					s += "\n";
-				}
+				maxSwitchLength = Std.max(maxSwitchLength, opt.switches.join(", ").length);
 			}
 			else
 			{
-				s += "<" + opt.name + ">";
+				maxSwitchLength = Std.max(maxSwitchLength, opt.name.length + 2);
 			}
-			if (opt.help != null) 
+		}
+		
+		var s = "";
+		for (opt in options)
+		{
+			if (opt.switches != null && opt.switches.length > 0)
 			{
-				s += "\t" + opt.help;
+				s += prefix + opt.switches.join(", ").rpad(" ", maxSwitchLength + 1);
 			}
+			else
+			{
+				s += prefix + ("<" + opt.name + ">").rpad(" ", maxSwitchLength + 1);
+			}
+			
+			if (opt.help != null && opt.help != "") 
+			{
+				var helpLines = opt.help.split("\n");
+				s += helpLines.shift() + "\n";
+				s += Lambda.map(helpLines, function(s) return prefix + "".lpad(" ", maxSwitchLength + 1) + s).join("\n");
+				s += "\n";
+			}
+			
 			s += "\n";
 		}
-		s += "\n";
+		
 		return s;
 	}
 
