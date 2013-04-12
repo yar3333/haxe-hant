@@ -19,9 +19,9 @@ class FileSystemTools
 	var native : Native;
 	#end
     
-    public function new(log:Log, ?ndll:String)
+    public function new(?log:Log, ?ndll:String)
     {
-        this.log = log;
+        this.log = log != null ? log : new Log(0);
 		
 		#if neko
 		this.native = ndll != null ? new Native(ndll) : null;
