@@ -5,27 +5,15 @@ import sys.io.File;
 import sys.io.Process;
 using StringTools;
 
-#if neko
-import neko.Lib;
-#elseif php
-import php.Lib;
-#end
-
 class FileSystemTools 
 {
     var log : Log;
+	var hantNdllPath : String;
 
-	#if neko
-	var native : Native;
-	#end
-    
-    public function new(?log:Log, ?ndll:String)
+    public function new(?log:Log, ?hantNdllPath:String)
     {
         this.log = log != null ? log : new Log(0);
-		
-		#if neko
-		this.native = ndll != null ? new Native(ndll) : null;
-		#end
+		this.hantNdllPath = hantNdllPath;
     }
     
     public function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool) : Void
@@ -114,18 +102,6 @@ class FileSystemTools
 		log.finishOk();
     }
 	
-	public function copyFile(src:String, dest:String)
-	{
-		#if neko
-		if (native != null)
-		{
-			native.copyFilePreservingAttributes(src, dest);
-		}
-		#else
-		File.copy(src, dest);
-		#end
-	}
-    
 	public function rename(path:String, newpath:String)
     {
         log.start("Rename '" + path + "' => '" + newpath + "'");
@@ -278,7 +254,7 @@ class FileSystemTools
         
         if (r == null)
         {
-            throw "HaXe not found (HAXEPATH environment variable not set).";
+			return "haxe";
         }
 		
 		r = r.replace("\\", "/");
@@ -286,11 +262,11 @@ class FileSystemTools
         {
             r = r.substr(0, r.length - 1);
         }
-        r += '/';
+        r += "/haxe" + (Sys.systemName() == "Windows" ? ".exe" : "");
         
-        if (!FileSystem.exists(r + "haxe.exe"))
+        if (!FileSystem.exists(r))
         {
-            throw "HaXe not found (file '" + r + "haxe.exe' does not exist).";
+            throw "Haxe compiler is not found (file '" + r + "' does not exist).";
         }
         
         return r;
@@ -318,4 +294,56 @@ class FileSystemTools
 			Sys.command("attrib", [ (hidden ? "+" : "-") + "H", path ]);
 		}
 	}
+	
+	#if neko
+	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
+	public function copyFile(src:String, dest:String)
+	{
+		if (hantNdllPath != null && Sys.systemName() == "Windows")
+		{
+			if (copy_file_preserving_attributes == null)
+			{
+				copy_file_preserving_attributes = neko.Lib.load(hantNdllPath, "copy_file_preserving_attributes", 2);
+			}
+			
+			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.path2native(src)), neko.Lib.haxeToNeko(PathTools.path2native(dest))));
+			
+			if (r != 0)
+			{
+				if (r == 1)
+				{
+					throw "Error open source file ('" + src + "').";
+				}
+				else
+				if (r == 2)
+				{
+					throw "Error open dest file ('" + dest + "').";
+				}
+				else
+				if (r == 3)
+				{
+					throw "Error get attributes from source file ('" + src + "').";
+				}
+				else
+				if (r == 4)
+				{
+					throw "Error set attributes to dest file ('" + dest + "').";
+				}
+				else
+				{
+					throw "Error code is " + r + ".";
+				}
+			}
+		}
+		else
+		{
+			File.copy(src, dest);
+		}
+	}
+	#else
+	public inline function copyFile(src:String, dest:String) : Void
+	{
+		File.copy(src, dest);
+	}
+	#end
 }

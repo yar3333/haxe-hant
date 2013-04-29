@@ -4,7 +4,10 @@ CFLAGS	= -fPIC -I/usr/lib/neko/include
 LDFLAGS = -shared -lneko
 
 all: $(OBJS)
-	$(CC) $(LDFLAGS) -o ../../ndll/Linux/hant.ndll hant.o
+	$(CC) $(LDFLAGS) $(CFLAGS) -o ../../ndll/Linux/hant.ndll hant.o
+
+hant.o:
+	$(CC) $(CFLAGS) -c hant.cpp
 
 clean:
 	rm -f $(OBJS)
