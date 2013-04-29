@@ -116,9 +116,7 @@ class FlashDevelopProject
 	
     function getLibPaths(xml:Xml) : Hash<String>
     {
-        var r = new Hash<String>();
 		var fast = new haxe.xml.Fast(xml.firstElement());
-		
 		var libs = new Array<String>();
 		if (fast.hasNode.haxelib)
 		{
@@ -131,24 +129,7 @@ class FlashDevelopProject
 				}
 			}
 		}
-		
-		var lines = Process.run(PathTools.path2normal(Sys.environment().get("HAXEPATH")) + "/haxelib.exe", [ "path" ].concat(libs)).stdOut.split("\n");
-		for (i in 0...lines.length)
-		{
-			if (lines[i].startsWith("-D "))
-			{
-				var lib = lines[i].substr("-D ".length);
-				if (Lambda.has(libs, lib))
-				{
-					var path = lines[i - 1].trim();
-					if (path == "") path = ".";
-					var p = path.replace("\\", "/").rtrim("/") + "/";
-					r.set(lib.toLowerCase(), p);
-				}
-			}
-		}
-		
-		return r;
+		return Haxelib.getPaths(libs);
     }
 	
 	function getIsDebug(xml:Xml) : Bool
