@@ -9,12 +9,8 @@ class Haxelib
 	{
 		var r = new Hash<String>();
 		
-		var haxelibOutput = Process.run("haxelib", [ "path" ].concat(libs)).stdOut;
-		if (haxelibOutput.indexOf("is not installed") >= 0)
-		{
-			throw new Exception("haxelib error:\n" + haxelibOutput);
-		}
-		var lines = haxelibOutput.split("\n");
+		var output = Process.run("haxelib", [ "path" ].concat(libs)).stdOut;
+		var lines = output.split("\n");
 		
 		for (i in 0...lines.length)
 		{
@@ -29,6 +25,11 @@ class Haxelib
 					r.set(lib, p);
 				}
 			}
+		}
+		
+		if (Lambda.count(r) != libs.length)
+		{
+			throw new Exception("haxelib error:\n" + output);
 		}
 		
 		return r;
