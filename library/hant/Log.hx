@@ -60,7 +60,7 @@ class Log
 		
 		if (exceptionToThrow != null)
 		{
-			throw exceptionToThrow;
+			stdlib.Exception.rethrow(exceptionToThrow);
 		}
     }
 	
