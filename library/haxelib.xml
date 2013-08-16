@@ -4,6 +4,6 @@
     <tag v='php'/>
     <tag v='neko'/>
     <description>Library with ant-like methods.</description>
-	<version name='1.3'>Add FlashDevelop project files parser.</version>
+	<version name='1.3.1'>FlashDevelop project: projectFilePath added.</version>
 	<depends name="stdlib" />
 </project>

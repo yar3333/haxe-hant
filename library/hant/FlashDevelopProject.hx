@@ -11,6 +11,8 @@ using stdlib.StringTools;
 
 class FlashDevelopProject 
 {
+	public var projectFilePath(default, null) : String;
+	
 	public var binPath(default, null) : String;
 	public var classPaths(default, null) : Array<String>;
 	public var libPaths(default, null) : Hash<String>;
@@ -24,7 +26,7 @@ class FlashDevelopProject
 	
 	public function new(path:String) 
 	{
-		var projectFilePath : String = null;
+		projectFilePath = null;
 		if (path != null && (path == "" || FileSystem.exists(path)))
 		{
 			projectFilePath = path == "" || FileSystem.isDirectory(path) ? findProjectFile(path) : path;
