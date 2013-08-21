@@ -17,7 +17,6 @@ build: $(OBJS)
 	link $(LDFLAGS) -OUT:$(OUT) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	echo $(NEKOPATH)
 	cl $(CCFLAGS) -c -Fo$@ $<
 
 clean:
