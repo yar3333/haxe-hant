@@ -13,14 +13,14 @@ class Log
     
     var inBlock : Bool;
     
-    var messages : IntHash<String>;
+    var messages : Map<Int,String>;
     
     public function new(verboseLevel:Int) 
     {
         this.verboseLevel = verboseLevel;
         level = -1;
         inBlock = false;
-        messages = new IntHash<String>();
+        messages = new Map<Int,String>();
     }
     
     public function start(message:String)

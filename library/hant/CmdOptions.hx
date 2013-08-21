@@ -29,7 +29,7 @@ class CmdOptions
 	var options : Array<Option>;
 	var args : Array<String>;
 	var paramWoSwitchIndex : Int;
-	var params : Hash<Dynamic>;
+	var params : Map<String,Dynamic>;
 
 	public function new()
 	{
@@ -114,12 +114,12 @@ class CmdOptions
 		return s;
 	}
 
-	public function parse(args:Array<String>) : Hash<Dynamic>
+	public function parse(args:Array<String>) : Map<String,Dynamic>
 	{
 		this.args = args.copy();
 		paramWoSwitchIndex = 0;
 		
-		params = new Hash<Dynamic>();
+		params = new Map<String,Dynamic>();
 		for (opt in options)
 		{
 			params.set(opt.name, opt.defaultValue);
@@ -139,7 +139,7 @@ class CmdOptions
 		
 		if (arg.substr(0, 1) == "-")
 		{
-			arg = ~/^(--?.+)=(.+)$/.customReplace(arg, function(r)
+			arg = ~/^(--?.+)=(.+)$/.map(arg, function(r)
 			{
 				args.unshift(r.matched(2));
 				return r.matched(1);
