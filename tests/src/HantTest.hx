@@ -3,7 +3,7 @@ package;
 import hant.FileSystemTools;
 import hant.CmdOptions;
 
-class TestA extends haxe.unit.TestCase
+class HantTest extends haxe.unit.TestCase
 {
     public function testSimple()
     {

@@ -6,3 +6,5 @@ build/*.user
 build/obj
 library.zip
 library/ndll/Windows/*.pdb
+library/ndll/Windows/*.exp
+library/ndll/Windows/*.lib

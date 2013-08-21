@@ -5,7 +5,7 @@ class Main
     static function main()
 	{
 		var r = new haxe.unit.TestRunner();
-		r.add(new TestA());
+		r.add(new HantTest());
 		r.run();
 	}
 }
