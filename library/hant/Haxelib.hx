@@ -5,9 +5,9 @@ using stdlib.StringTools;
 
 class Haxelib
 {
-	public static function getPaths(libs:Array<String>) : Hash<String>
+	public static function getPaths(libs:Array<String>) : Map<String,String>
 	{
-		var r = new Hash<String>();
+		var r = new Map<String,String>();
 		
 		var output = Process.run("haxelib", [ "path" ].concat(libs)).stdOut;
 		var lines = output.split("\n");
@@ -29,7 +29,7 @@ class Haxelib
 		
 		if (Lambda.count(r) != libs.length)
 		{
-			throw new Exception("haxelib error:\n" + output);
+			throw new Exception("haxelib error: haxelib path " + libs.join(" ") + "\n" + output);
 		}
 		
 		return r;
