@@ -15,7 +15,7 @@ class FlashDevelopProject
 	
 	public var binPath(default, null) : String;
 	public var classPaths(default, null) : Array<String>;
-	public var libPaths(default, null) : Hash<String>;
+	public var libPaths(default, null) : Map<String,String>;
 	public var allClassPaths(default, null) : Array<String>;
 	public var isDebug(default, null) : Bool;
 	public var srcPath(default, null) : String;
@@ -116,7 +116,7 @@ class FlashDevelopProject
 		return r;
     }
 	
-    function getLibPaths(xml:Xml) : Hash<String>
+    function getLibPaths(xml:Xml) : Map<String,String>
     {
 		var fast = new haxe.xml.Fast(xml.firstElement());
 		var libs = new Array<String>();

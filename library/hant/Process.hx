@@ -7,6 +7,11 @@ class Process extends sys.io.Process
 {
 	public static function run(?log:Log, fileName:String, args:Array<String>, verbose=false) : { exitCode:Int, stdOut:String, stdErr:String }
 	{
+		if (log != null)
+		{
+			log.trace(fileName.replace("/", "\\") + " " + args.join(" "));
+		}		
+		
 		var p = new Process(fileName, args);
 		
 		var stdOut = "";
@@ -14,7 +19,7 @@ class Process extends sys.io.Process
 		{
 			while (true)
 			{
-				Sys.sleep(0.1);
+				Sys.sleep(0.01);
 				var s = p.stdout.readLine();
 				if (verbose) Lib.println(s);
 				stdOut += s + "\n";
@@ -30,11 +35,10 @@ class Process extends sys.io.Process
 		{
 			if (log != null)
 			{
-				log.trace(fileName.replace("/", "\\") + " " + args.join(" ") + " ");
 				log.trace("Run error: " + exitCode);
 			}
 		}
 		
-		return { exitCode:exitCode, stdOut:stdOut, stdErr:stdErr };
+		return { exitCode:exitCode, stdOut:stdOut.replace("\r", ""), stdErr:stdErr };
 	}
 }
