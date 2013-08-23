@@ -16,11 +16,11 @@ class HantTest extends haxe.unit.TestCase
 		var parser = new CmdOptions();
 		parser.add("isRecursive", false, [ "-r", "--recursive"]);
 		parser.add("count", 0, [ "-c", "--count"]);
-		parser.add("path", "bin", [ "-c", "--count"]);
-		parser.parse([ "test", "-c", "10", "-r" ]);
+		parser.add("path", "bin");
+		parser.parse([ "testpath", "-c", "10", "-r" ]);
 		
 		assertEquals(10, parser.get("count"));
 		assertEquals(true, parser.get("isRecursive"));
-		assertEquals("bin", parser.get("path"));
+		assertEquals("testpath", parser.get("path"));
 	}
 }
