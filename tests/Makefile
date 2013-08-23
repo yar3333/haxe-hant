@@ -1,4 +1,4 @@
 neko:
-	xcopy support bin /E /Y
+	cp -r support/* bin
 	haxe -cp ../../stdlib/library -cp ../library -cp src -main Main -neko bin/index.n
-	run.cmd neko index.n
+	cd bin && neko index.n

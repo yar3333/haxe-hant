@@ -1,5 +1,7 @@
 ifeq ($(shell getconf LONG_BIT),64)
-	X64=1
+	PLATFORM=Linux64
+else
+	PLATFORM=Linux
 endif
 
 SRC_DIR=src
@@ -7,13 +9,9 @@ OBJ_DIR=obj
 
 OBJS=$(OBJ_DIR)/hant.o
 
-ifdef X64
-	OUT=../library/ndll/Linux64/hant.ndll
-else
-	OUT=../library/ndll/Linux/hant.ndll
-endif 
+OUT=../library/ndll/$(PLATFORM)/hant.ndll
 
-CC=gcc
+CC=g++
 
 CFLAGS=-shared -fPIC #-I/usr/lib/neko/include
 LDFLAGS=-shared -lneko
@@ -26,6 +24,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 clean:
 	rm -f $(OBJS)
-	rm -rf $(OUT)
+	rm -f $(OUT)
 
 all: clean build
