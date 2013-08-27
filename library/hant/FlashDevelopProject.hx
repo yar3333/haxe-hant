@@ -227,7 +227,7 @@ class FlashDevelopProject
 		return null;
 	}
 	
-	public function getBuildParams(platform:String, destPath:String, defines:Array<String>) : Array<String>
+	public function getBuildParams(platform:String, destPath:String, addDefines:Array<String>, ?removeDefines:Array<String>) : Array<String>
 	{
         var params = new Array<String>();
         
@@ -252,9 +252,9 @@ class FlashDevelopProject
 			params.push("-debug");
 		}
 		
-		for (d in directives.concat(defines))
+		for (d in directives.concat(addDefines))
 		{
-			if (d != null && d != "")
+			if (d != null && d != "" && (removeDefines == null || !Lambda.has(removeDefines, d)))
 			{
 				params = params.concat([ "-D", d ]);
 			}
