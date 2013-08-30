@@ -1,4 +1,4 @@
-neko:
-	cp -r support/* bin
-	haxe -cp ../../stdlib/library -cp ../library -cp src -main Main -neko bin/index.n
-	cd bin && neko index.n
+include Makefile.platform
+include Makefile.test
+
+HAXE_COMPILER_OPTIONS=-lib stdlib
