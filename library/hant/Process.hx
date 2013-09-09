@@ -1,11 +1,12 @@
 package hant;
 
 import neko.Lib;
+import neko.vm.Thread;
 using StringTools;
 
 class Process extends sys.io.Process 
 {
-	public static function run(?log:Log, fileName:String, args:Array<String>, verbose=false) : { exitCode:Int, stdOut:String, stdErr:String }
+	public static function run(?log:Log, fileName:String, args:Array<String>, ?input:String, verbose=false) : { exitCode:Int, output:String, error:String }
 	{
 		if (log != null)
 		{
@@ -14,21 +15,58 @@ class Process extends sys.io.Process
 		
 		var p = new Process(fileName, args);
 		
-		var stdOut = "";
-		try
+		if (input != null)
 		{
-			while (true)
-			{
-				Sys.sleep(0.01);
-				var s = p.stdout.readLine();
-				if (verbose) Lib.println(s);
-				stdOut += s + "\n";
-			}
+			p.stdin.writeString(input);
+			p.stdin.close();
 		}
-		catch (e:haxe.io.Eof) {}
+		
+		var output : String;
+		Thread.create(function()
+		{
+			var buffer = "";
+			try
+			{
+				while (true)
+				{
+					var s = p.stdout.readByte();
+					if (verbose && s == "\n")
+					{
+						var n = buffer.lastIndexOf("\n");
+						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
+					}
+					buffer += String.fromCharCode(s);
+				}
+			}
+			catch (e:haxe.io.Eof) { }
+			output = buffer;
+		});
+		
+		var error : String;
+		Thread.create(function()
+		{
+			var buffer = "";
+			try
+			{
+				while (true)
+				{
+					var s = p.stderr.readByte();
+					if (verbose && s == "\n")
+					{
+						var n = buffer.lastIndexOf("\n");
+						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
+					}
+					buffer += String.fromCharCode(s);
+				}
+			}
+			catch (e:haxe.io.Eof) { }
+			error = buffer;
+		});
 		
 		var exitCode = p.exitCode();
-		var stdErr = p.stderr.readAll().toString().replace("\r\n", "\n");
+		
+		while (output == null || error == null) Sys.sleep(0.01);
+		
 		p.close();
 		
 		if (exitCode != 0)
@@ -39,6 +77,6 @@ class Process extends sys.io.Process
 			}
 		}
 		
-		return { exitCode:exitCode, stdOut:stdOut.replace("\r", ""), stdErr:stdErr };
+		return { exitCode:exitCode, output:output.replace("\r", ""), error:error };
 	}
 }

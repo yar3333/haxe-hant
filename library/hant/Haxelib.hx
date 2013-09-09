@@ -9,7 +9,7 @@ class Haxelib
 	{
 		var r = new Map<String,String>();
 		
-		var output = Process.run("haxelib", [ "path" ].concat(libs)).stdOut;
+		var output = Process.run("haxelib", [ "path" ].concat(libs)).output;
 		var lines = output.split("\n");
 		
 		for (i in 0...lines.length)
