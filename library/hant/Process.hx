@@ -29,13 +29,13 @@ class Process extends sys.io.Process
 			{
 				while (true)
 				{
-					var s = p.stdout.readByte();
+					var s = String.fromCharCode(p.stdout.readByte());
 					if (verbose && s == "\n")
 					{
 						var n = buffer.lastIndexOf("\n");
 						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
 					}
-					buffer += String.fromCharCode(s);
+					buffer += s;
 				}
 			}
 			catch (e:haxe.io.Eof) { }
@@ -50,13 +50,13 @@ class Process extends sys.io.Process
 			{
 				while (true)
 				{
-					var s = p.stderr.readByte();
+					var s = String.fromCharCode(p.stderr.readByte());
 					if (verbose && s == "\n")
 					{
 						var n = buffer.lastIndexOf("\n");
 						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
 					}
-					buffer += String.fromCharCode(s);
+					buffer += s;
 				}
 			}
 			catch (e:haxe.io.Eof) { }
