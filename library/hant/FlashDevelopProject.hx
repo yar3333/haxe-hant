@@ -242,7 +242,15 @@ class FlashDevelopProject
         }
 		
 		params.push("-" + platform);
-		params.push(destPath);
+		if (destPath != null && destPath != "")
+		{
+			params.push(destPath);
+		}
+		else
+		{
+			params.push("null");
+			params.push("--no-output");
+		}
 		
 		params.push("-main");
 		params.push("Main");

@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Minor.",
-  "version": "1.4.1",
+  "releasenote": "Support of the '--no-output' option.",
+  "version": "1.4.2",
   "url": "https://code.google.com/p/hant/",
   "dependencies": {
     "stdlib": ""
