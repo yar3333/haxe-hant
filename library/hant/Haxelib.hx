@@ -34,4 +34,13 @@ class Haxelib
 		
 		return r;
 	}
+	
+	public static getStdLibPath()
+	{
+		var haxeStdPath = Sys.getEnv("HAXE_STD_PATH");
+		if (haxeStdPath != null && haxeStdPath != "") return haxeStdPath.rtrim("\\/");
+		var haxePath = Sys.getEnv("HAXEPATH");
+		if (haxePath != null && haxePath != "") return haxe.io.Path.addTrailingSlash(haxePath) + "std";
+		return Sys.systemName() == "Windows" ? "C:\\HaxeToolkit\\haxe\\std" : "/usr/share/haxe/std";
+	}
 }
