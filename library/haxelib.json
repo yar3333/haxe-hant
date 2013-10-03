@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Support of the '--no-output' option.",
-  "version": "1.4.2",
+  "releasenote": "Support getting haxe std library path.",
+  "version": "1.4.3",
   "url": "https://code.google.com/p/hant/",
   "dependencies": {
     "stdlib": ""
