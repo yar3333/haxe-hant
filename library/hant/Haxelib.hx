@@ -35,7 +35,7 @@ class Haxelib
 		return r;
 	}
 	
-	public static getStdLibPath()
+	public static function getStdLibPath()
 	{
 		var haxeStdPath = Sys.getEnv("HAXE_STD_PATH");
 		if (haxeStdPath != null && haxeStdPath != "") return haxeStdPath.rtrim("\\/");

@@ -41,7 +41,7 @@ class FlashDevelopProject
 		binPath = getBinPath(xml);
 		classPaths = getClassPaths(xml);
 		libPaths = getLibPaths(xml);
-		allClassPaths = Lambda.array(libPaths).concat(classPaths);
+		allClassPaths = [ Haxelib.getStdLibPath() ].concat(Lambda.array(libPaths).concat(classPaths));
 		isDebug = getIsDebug(xml);
 		srcPath = getSrcPath(xml);
 		platform = getPlatform(xml);
