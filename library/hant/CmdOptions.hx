@@ -105,13 +105,16 @@ class CmdOptions
 				var helpLines = opt.help.split("\n");
 				s += helpLines.shift() + "\n";
 				s += Lambda.map(helpLines, function(s) return prefix + "".lpad(" ", maxSwitchLength + 1) + s).join("\n");
+			}
+			else
+			{
 				s += "\n";
 			}
 			
 			s += "\n";
 		}
 		
-		return s;
+		return s.rtrim() + "\n";
 	}
 
 	public function parse(args:Array<String>) : Map<String,Dynamic>
