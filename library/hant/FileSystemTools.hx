@@ -65,7 +65,7 @@ class FileSystemTools
 			log.start("Create directory '" + path + "'");
 			try
 			{
-				path = PathTools.path2normal(path);
+				path = PathTools.normalize(path);
 				var dirs : Array<String> = path.split("/");
 				for (i in 0...dirs.length)
 				{
@@ -89,8 +89,8 @@ class FileSystemTools
     
     public function copyFolderContent(src:String, dest:String)
     {
-		src = PathTools.path2normal(src);
-        dest = PathTools.path2normal(dest);
+		src = PathTools.normalize(src);
+        dest = PathTools.normalize(dest);
 		
 		log.start("Copy directory '" + src + "' => '" + dest + "'");
         
@@ -306,7 +306,7 @@ class FileSystemTools
 				copy_file_preserving_attributes = neko.Lib.load(hantNdllPath, "copy_file_preserving_attributes", 2);
 			}
 			
-			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.path2native(src)), neko.Lib.haxeToNeko(PathTools.path2native(dest))));
+			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.makeNative(src)), neko.Lib.haxeToNeko(PathTools.makeNative(dest))));
 			
 			if (r != 0)
 			{
