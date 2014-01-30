@@ -8,55 +8,73 @@ import php.Lib;
 
 class Log 
 {
-    var verboseLevel : Int;
-    var level : Int;
-    
+    var depthLimit : Int;
+    var levelLimit : Int;
+    var depth : Int;
+	var ind : Int;
     var inBlock : Bool;
+	var shown : Array<Bool>;
     
-    var messages : Map<Int,String>;
-    
-    public function new(verboseLevel:Int) 
+    public function new(depthLimit=2147483647, levelLimit=2147483647)
     {
-        this.verboseLevel = verboseLevel;
-        level = -1;
+        this.depthLimit = depthLimit;
+        this.levelLimit = levelLimit;
+        depth = -1;
+		ind = 0;
         inBlock = false;
-        messages = new Map<Int,String>();
+		shown = [];
     }
     
-    public function start(message:String)
+    public function start(message:String, level=0)
     {
-        level++;
-        if (level < verboseLevel)
+        depth++;
+        if (depth < depthLimit)
         {
-            if (inBlock) println("");
-            print(indent(level) + message + ": ");
-            inBlock = true;
+            if (level < levelLimit)
+			{
+				if (inBlock) println("");
+				print(indent(ind) + message + ": ");
+				inBlock = true;
+				shown.push(true);
+				ind++;
+			}
+			else
+			{
+				shown.push(false);
+			}
         }
-        messages.set(level, message);
     }
     
     public function finishOk()
     {
-        if (level < verboseLevel)
+        if (depth < depthLimit)
         {
-            if (!inBlock) print(indent(level + 1));
-            println("[OK]");
-            inBlock = false;
+            if (shown.pop())
+			{
+				if (!inBlock) print(indent(ind));
+				ind--;
+				println("[OK]");
+				inBlock = false;
+			}
         }
         
-        level--;
+        depth--;
     }
     
     public function finishFail(?exceptionToThrow:Dynamic)
     {
-        if (level < verboseLevel)
+        if (depth < depthLimit)
         {
-            if (!inBlock) print(indent(level + 1));
-            println("[FAIL]");
-            inBlock = false;
+            if (shown.pop())
+			{
+				if (!inBlock) print(indent(ind));
+				ind--;
+				println("[FAIL]");
+				inBlock = false;
+			}
         }
         
-        level--;
+        depth--;
 		
 		if (exceptionToThrow != null)
 		{
@@ -64,19 +82,22 @@ class Log
 		}
     }
 	
-	public function trace(message:String)
+	public function trace(message:String, level=0)
 	{
-		if (level < verboseLevel)
+		if (depth < depthLimit)
 		{
-			if (inBlock) println("");
-			println(indent(level + 1) + message);
-			inBlock = false;
+            if (level < levelLimit)
+			{
+				if (inBlock) println("");
+				println(indent(ind + 1) + message);
+				inBlock = false;
+			}
 		}
 	}
 	
-    function indent(level:Int) : String
+    function indent(depth:Int) : String
     {
-        return StringTools.rpad("", " ", level * 2);
+        return StringTools.rpad("", " ", depth * 2);
     }
 	
 	function print(s:String)
