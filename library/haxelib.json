@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Minors.",
-  "version": "1.5.1",
+  "releasenote": "Process: speed optimization.",
+  "version": "1.5.2",
   "url": "https://code.google.com/p/hant/",
   "dependencies": {
     "stdlib": ""
