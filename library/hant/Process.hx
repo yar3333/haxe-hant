@@ -6,7 +6,7 @@ using StringTools;
 
 class Process extends sys.io.Process 
 {
-	public static function run(?log:Log, fileName:String, args:Array<String>, ?input:String, verbose=false) : { exitCode:Int, output:String, error:String }
+	public static function run(fileName:String, args:Array<String>, ?input:String, verbose=false, ?log:Log) : { exitCode:Int, output:String, error:String }
 	{
 		if (log != null)
 		{

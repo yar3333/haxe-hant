@@ -1,12 +1,9 @@
 package hant;
 
-import hant.Log;
-import hant.PathTools;
-import hant.Process;
 import stdlib.Exception;
+import stdlib.Std;
 import sys.FileSystem;
 import sys.io.File;
-import stdlib.Std;
 using stdlib.StringTools;
 
 class FlashDevelopProject 
