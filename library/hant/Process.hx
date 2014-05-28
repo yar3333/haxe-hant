@@ -1,5 +1,6 @@
 package hant;
 
+import haxe.io.Bytes;
 import neko.Lib;
 import neko.vm.Thread;
 using StringTools;
@@ -24,43 +25,57 @@ class Process extends sys.io.Process
 		var output : String;
 		Thread.create(function()
 		{
-			var buffer = "";
+			var buffer = new StringBuf();
 			try
 			{
 				while (true)
 				{
-					var s = String.fromCharCode(p.stdout.readByte());
-					if (verbose && s == "\n")
+					var bytes = Bytes.alloc(4096);
+					var n = p.stdout.readBytes(bytes, 0, 4096);
+					var s = bytes.getString(0, n);
+					for (i in 0...s.length)
 					{
-						var n = buffer.lastIndexOf("\n");
-						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
+						var c = s.charAt(i);
+						if (verbose && c == "\n")
+						{
+							var bufStr = buffer.toString();
+							var n = bufStr.lastIndexOf("\n");
+							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+						}
+						buffer.add(c);
 					}
-					buffer += s;
 				}
 			}
 			catch (e:haxe.io.Eof) { }
-			output = buffer;
+			output = buffer.toString();
 		});
 		
 		var error : String;
 		Thread.create(function()
 		{
-			var buffer = "";
+			var buffer = new StringBuf();
 			try
 			{
 				while (true)
 				{
-					var s = String.fromCharCode(p.stderr.readByte());
-					if (verbose && s == "\n")
+					var bytes = Bytes.alloc(4096);
+					var n = p.stdout.readBytes(bytes, 0, 4096);
+					var s = bytes.getString(0, n);
+					for (i in 0...s.length)
 					{
-						var n = buffer.lastIndexOf("\n");
-						Lib.println(n < 0 ? buffer : buffer.substr(n + 1));
+						var c = s.charAt(i);
+						if (verbose && c == "\n")
+						{
+							var bufStr = buffer.toString();
+							var n = bufStr.lastIndexOf("\n");
+							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+						}
+						buffer.add(c);
 					}
-					buffer += s;
 				}
 			}
 			catch (e:haxe.io.Eof) { }
-			error = buffer;
+			error = buffer.toString();
 		});
 		
 		var exitCode = p.exitCode();
