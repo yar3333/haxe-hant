@@ -5,8 +5,22 @@ import neko.Lib;
 import neko.vm.Thread;
 using StringTools;
 
+/**
+ * Exception with type Int may be thown by runDetached.
+ */
+class ProceessErrorCode
+{
+	public static inline var UNKNOW = 0;
+	public static inline var ARG_LIST_TOO_LONG = 1;
+	public static inline var INVALID_ARGUMENT = 2;
+	public static inline var FILE_NOT_FOUND = 3;
+	public static inline var FORMAT_ERROR = 4;
+	public static inline var NOT_ENOUGH_MEMORY = 5;
+}
+
 class Process extends sys.io.Process 
 {
+	
 	public static function run(fileName:String, args:Array<String>, ?input:String, verbose=false, ?log:Log) : { exitCode:Int, output:String, error:String }
 	{
 		if (log != null)
@@ -94,4 +108,18 @@ class Process extends sys.io.Process
 		
 		return { exitCode:exitCode, output:output.replace("\r", ""), error:error };
 	}
+	
+	/**
+	 * Run child process detached and return PID.
+	 */
+	public static function runDetached(fileName:String, args:Array<String>, hantNdll="hant") : Int
+	{
+		if (_process_run_detached == null)
+		{
+			_process_run_detached = Lib.load(hantNdll, "process_run_detached", 2);
+		}
+		return Lib.nekoToHaxe(_process_run_detached(Lib.haxeToNeko(fileName), Lib.haxeToNeko(args)));
+	}
+	
+	static var _process_run_detached : Dynamic;
 }

@@ -11,8 +11,10 @@
 	#include <utime.h>
 	#include <fcntl.h>
 	#include <stdio.h>
+	#include <process.h>
 	#include <ctime>
-	//#include <cstdio>    // fopen, fclose, fread, fwrite, BUFSIZ
+	#include <stdlib.h>
+	#include <errno.h>
 #endif
 
 #include <neko.h>
@@ -20,7 +22,7 @@
 int copyfiletimes(const char *src, const char *dst);
 
 value copy_file_preserving_attributes(value src, value dst)
-{	
+{
     // BUFSIZE default is 8192 bytes
     // BUFSIZE of 1 means one chareter at time
     // good values should fit to blocksize, like 1024 or 4096
@@ -63,6 +65,39 @@ value copy_file_preserving_attributes(value src, value dst)
 }
 DEFINE_PRIM(copy_file_preserving_attributes, 2);
 
+value process_run_detached(value command, value args)
+{
+	val_check( command, string );
+	val_check( args, array );
+	
+	int argsSize = val_array_size(args);
+	char** argsNative = new char*[argsSize + 2];
+	argsNative[0] = val_string(command);
+	argsNative[argsSize + 1] = NULL;
+	value* argsPtr = val_array_ptr(args);
+	for (int i=1; i<=argsSize; i++, argsPtr++)
+	{
+		val_check( *argsPtr, string );
+		argsNative[i] = val_string(*argsPtr);
+	}
+	
+	int r = _spawnvp(_P_DETACH, val_string(command), argsNative);
+	
+	delete [] argsNative;
+	
+	if (r < 0)
+	{
+		if (errno == E2BIG)		val_throw(alloc_int(1));
+		if (errno == EINVAL)	val_throw(alloc_int(2));
+		if (errno == ENOENT)	val_throw(alloc_int(3));
+		if (errno == ENOEXEC)	val_throw(alloc_int(4));
+		if (errno == ENOMEM)	val_throw(alloc_int(5));
+		val_throw(alloc_int(0));
+	}
+	
+	return alloc_int(r);
+}
+DEFINE_PRIM(process_run_detached, 2);
 /**************************************************************************************/
 
 int copyfiletimes(const char *src, const char *dst)
