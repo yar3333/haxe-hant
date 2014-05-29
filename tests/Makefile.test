@@ -19,7 +19,7 @@ neko: prepare bin/index.n
 	cd bin && neko index.n 
 
 js: prepare bin/index.js
-	cd bin && cmd /C start index.html
+	cd bin && cmd /K start index.html
 
 php: prepare bin/index.php
 	cd bin && php index.php
@@ -38,6 +38,6 @@ prepare: clean | bin
 
 bin:
 	mkdir -p bin
-
+	
 clean:
 	rm -rf bin/*
