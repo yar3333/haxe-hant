@@ -1,20 +1,14 @@
+#include <stdio.h>
+
 #if _WINDOWS
 	#include <windows.h>
-	#include <stdio.h>
-	#include <stdlib.h>
-	#include <wchar.h>
+	#include <process.h>
+	#include <errno.h>
 #else
 	#include <sys/stat.h>
-	#include <sys/time.h>
-	#include <sys/types.h>
-	#include <time.h>
 	#include <utime.h>
-	#include <fcntl.h>
-	#include <stdio.h>
-	#include <process.h>
-	#include <ctime>
 	#include <stdlib.h>
-	#include <errno.h>
+	#include <unistd.h>
 #endif
 
 #include <neko.h>
@@ -23,11 +17,6 @@ int copyfiletimes(const char *src, const char *dst);
 
 value copy_file_preserving_attributes(value src, value dst)
 {
-    // BUFSIZE default is 8192 bytes
-    // BUFSIZE of 1 means one chareter at time
-    // good values should fit to blocksize, like 1024 or 4096
-    // higher values reduce number of system calls
-    // size_t BUFFER_SIZE = 4096;
 	char buf[BUFSIZ];
     size_t size;
 	FILE *source, *dest;
@@ -49,8 +38,6 @@ value copy_file_preserving_attributes(value src, value dst)
 		return alloc_int(2);
 	}
 
-    // clean and more secure
-    // feof(FILE* stream) returns non-zero if the end of file indicator for stream is set
     while (size = fread(buf, 1, BUFSIZ, source))
 	{
         fwrite(buf, 1, size, dest);
@@ -81,10 +68,8 @@ value process_run_detached(value command, value args)
 		argsNative[i] = val_string(*argsPtr);
 	}
 	
+#if _WINDOWS
 	int r = _spawnvp(_P_DETACH, val_string(command), argsNative);
-	
-	delete [] argsNative;
-	
 	if (r < 0)
 	{
 		if (errno == E2BIG)		val_throw(alloc_int(1));
@@ -94,6 +79,16 @@ value process_run_detached(value command, value args)
 		if (errno == ENOMEM)	val_throw(alloc_int(5));
 		val_throw(alloc_int(0));
 	}
+#else
+	int r = fork();
+	if (r == 0)
+	{
+		execvp(val_string(command), argsNative);
+		exit(0);
+	}
+#endif
+	
+	delete [] argsNative;
 	
 	return alloc_int(r);
 }
