@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Process: speed optimization.",
-  "version": "1.5.2",
+  "releasenote": "Added NdllTools class (smart search for ndll files). Added Process.runDetached() method.",
+  "version": "1.6.0",
   "url": "https://code.google.com/p/hant/",
   "dependencies": {
     "stdlib": ""
