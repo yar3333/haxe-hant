@@ -112,11 +112,11 @@ class Process extends sys.io.Process
 	/**
 	 * Run child process detached and return PID.
 	 */
-	public static function runDetached(fileName:String, args:Array<String>, hantNdll="hant") : Int
+	public static function runDetached(fileName:String, args:Array<String>) : Int
 	{
 		if (_process_run_detached == null)
 		{
-			_process_run_detached = Lib.load(hantNdll, "process_run_detached", 2);
+			_process_run_detached = NdllTools.load("hant", "process_run_detached", 2);
 		}
 		return Lib.nekoToHaxe(_process_run_detached(Lib.haxeToNeko(fileName), Lib.haxeToNeko(args)));
 	}

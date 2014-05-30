@@ -8,7 +8,7 @@ class HantTest extends haxe.unit.TestCase
 {
     public function testSimple()
     {
-		var fs = new FileSystemTools(new hant.Log(5), "../hant-windows");
+		var fs = new FileSystemTools(new hant.Log(5));
 		assertTrue(fs != null);
     }
 	
@@ -25,11 +25,19 @@ class HantTest extends haxe.unit.TestCase
 		assertEquals("testpath", parser.get("path"));
 	}
 	
-	public function testNdll()
+	public function testNdllHant()
 	{
 		var lib = "hant";
 		var path = NdllTools.getPath(lib);
-		print("Path to ndll '" + lib + "' is '" + path + "'\n");
+		print("\n\tPath to ndll '" + lib + "' is '" + path + "'\n");
+		assertTrue(path != null);
+	}
+	
+	public function testNdllCurl()
+	{
+		var lib = "curl";
+		var path = NdllTools.getPath(lib);
+		print("\n\tPath to ndll '" + lib + "' is '" + path + "'\n");
 		assertTrue(path != null);
 	}
 }

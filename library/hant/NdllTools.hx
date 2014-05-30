@@ -15,8 +15,6 @@ class NdllTools
 	
 	public static function getPath(lib:String) : String
 	{
-		trace("Loader.local().getPath = " + Loader.local().getPath());
-		
 		if (lib.endsWith(".ndll")) return lib;
 		
 		if (paths == null) paths = new Map<String, String>();
@@ -29,7 +27,6 @@ class NdllTools
 			exeDir = Path.directory(moduleName != "" ? moduleName : Sys.executablePath());
 			if (exeDir == "") exeDir = ".";
 			exeDir = FileSystem.fullPath(exeDir);
-			trace("\nexeDir = " + exeDir);
 		}
 		
 		var testedPaths = [];
@@ -88,7 +85,7 @@ class NdllTools
 			catch (e:Dynamic) {}
 		}
 		
-		throw "Path to ndll '" + lib + "' is not found. Tested paths: " + testedPaths + ".";
+		return null;
 	}
 	
 	public static function load(lib:String, prim:String, nargs:Int) : Dynamic
