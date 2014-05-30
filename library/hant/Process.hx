@@ -44,9 +44,7 @@ class Process extends sys.io.Process
 			{
 				while (true)
 				{
-					var bytes = Bytes.alloc(4096);
-					var n = p.stdout.readBytes(bytes, 0, 4096);
-					var s = bytes.getString(0, n);
+					var s = p.stdout.readString(1);
 					for (i in 0...s.length)
 					{
 						var c = s.charAt(i);
@@ -72,9 +70,7 @@ class Process extends sys.io.Process
 			{
 				while (true)
 				{
-					var bytes = Bytes.alloc(4096);
-					var n = p.stdout.readBytes(bytes, 0, 4096);
-					var s = bytes.getString(0, n);
+					var s = p.stderr.readString(1);
 					for (i in 0...s.length)
 					{
 						var c = s.charAt(i);

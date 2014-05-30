@@ -1,8 +1,11 @@
 package hant;
 
+import sys.FileSystem;
+using StringTools;
+
 class Haxe
 {
-	public function getHaxePath()
+	public static function getCompilerPath()
     {
         var r = Sys.getEnv("HAXEPATH");
         
@@ -18,7 +21,7 @@ class Haxe
         }
         r += "/haxe" + (Sys.systemName() == "Windows" ? ".exe" : "");
         
-        if (!FileSystem.exists(r))
+        if (!FileSystem.exists(r) || FileSystem.isDirectory(r))
         {
             throw "Haxe compiler is not found (file '" + r + "' does not exist).";
         }
