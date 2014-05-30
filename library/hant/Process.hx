@@ -36,7 +36,7 @@ class Process extends sys.io.Process
 			p.stdin.close();
 		}
 		
-		var output : String;
+		var output : String = null;
 		Thread.create(function()
 		{
 			var buffer = new StringBuf();
@@ -64,7 +64,7 @@ class Process extends sys.io.Process
 			output = buffer.toString();
 		});
 		
-		var error : String;
+		var error : String = null;
 		Thread.create(function()
 		{
 			var buffer = new StringBuf();
