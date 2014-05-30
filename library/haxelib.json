@@ -6,7 +6,7 @@
   "contributors": ["yar3333"],
   "releasenote": "Added NdllTools class (smart search for ndll files). Added Process.runDetached() method.",
   "version": "1.6.0",
-  "url": "https://code.google.com/p/hant/",
+  "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {
     "stdlib": ""
   }
