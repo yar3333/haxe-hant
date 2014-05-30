@@ -8,12 +8,10 @@ using StringTools;
 class FileSystemTools 
 {
     var log : Log;
-	var hantNdllPath : String;
 
-    public function new(?log:Log, ?hantNdllPath:String)
+    public function new(?log:Log)
     {
         this.log = log != null ? log : new Log(0);
-		this.hantNdllPath = hantNdllPath;
     }
     
     public function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool) : Void
@@ -199,40 +197,6 @@ class FileSystemTools
 		}
 	}
 	
-	/*public function runCmd(fileName:String, args:Array<String>)
-	{
-		var env = Sys.environment();
-		if (!env.exists("ComSpec") || !FileSystem.exists(env.get("ComSpec")))
-		{
-			throw "Command processor not found (please, set 'ComSpec' environment variable).";
-		}
-		return run(env.get("ComSpec"), [ "/C", fileName.replace("/", "\\") ].concat(args));
-	}*/
-    
-    /*public function getWindowsRegistryValue(key:String) : String
-    {
-        var dir = neko.Sys.getEnv("TMP");
-		if (dir == null)
-        {
-			dir = "."; 		
-        }
-        var temp = dir + "/hant-tasks-get_windows_registry_value.txt";
-		if (neko.Sys.command('regedit /E "' + temp + '" "' + key + '"') != 0) 
-        {
-			// might fail without appropriate rights
-			return null;
-		}
-		// it's possible that if registry access was disabled the proxy file is not created
-		var content = try neko.io.File.getContent(temp) catch ( e : Dynamic ) return null;
-        content = content.replace("\x00", "").replace('\r', '').replace('\\\\', '\\');
-		neko.FileSystem.deleteFile(temp);
-        
-        var re = new EReg('^@="(.*)"$', 'm');
-        if (re.match(content)) return re.matched(1);
-        
-        return content;
-    }*/
-	
 	public function restoreFileTimes(src:String, dest:String, ?filter:EReg)
 	{
 		findFiles(src, function(srcFile)
@@ -240,37 +204,13 @@ class FileSystemTools
 			if (filter == null || filter.match(srcFile))
 			{
 				var destFile = dest + srcFile.substr(src.length);
-				if (File.getContent(srcFile) == File.getContent(destFile))
+				if (FileSystem.exists(destFile) && File.getContent(srcFile) == File.getContent(destFile))
 				{
 					rename(srcFile, destFile);
 				}
 			}
 		});
 	}
-	
-	public function getHaxePath()
-    {
-        var r = Sys.getEnv("HAXEPATH");
-        
-        if (r == null)
-        {
-			return "haxe";
-        }
-		
-		r = r.replace("\\", "/");
-        while (r.endsWith("/"))
-        {
-            r = r.substr(0, r.length - 1);
-        }
-        r += "/haxe" + (Sys.systemName() == "Windows" ? ".exe" : "");
-        
-        if (!FileSystem.exists(r))
-        {
-            throw "Haxe compiler is not found (file '" + r + "' does not exist).";
-        }
-        
-        return r;
-    }
     
 	public function getHiddenFileAttribute(path:String) : Bool
 	{
@@ -299,11 +239,11 @@ class FileSystemTools
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	public function copyFile(src:String, dest:String)
 	{
-		if (hantNdllPath != null && Sys.systemName() == "Windows")
+		if (Sys.systemName() == "Windows" && NdllTools.getPath("hant") != null)
 		{
 			if (copy_file_preserving_attributes == null)
 			{
-				copy_file_preserving_attributes = neko.Lib.load(hantNdllPath, "copy_file_preserving_attributes", 2);
+				copy_file_preserving_attributes = NdllTools.load("hant", "copy_file_preserving_attributes", 2);
 			}
 			
 			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.makeNative(src)), neko.Lib.haxeToNeko(PathTools.makeNative(dest))));
