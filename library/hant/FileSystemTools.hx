@@ -1,5 +1,6 @@
 package hant;
 
+import haxe.io.Path;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
@@ -107,6 +108,9 @@ class FileSystemTools
         {
             if (FileSystem.exists(path))
             {
+				var dir = haxe.io.Path.directory(newpath);
+				if (dir != "") createDirectory(dir);
+				
                 if (!FileSystem.isDirectory(path))
 				{
 					if (FileSystem.exists(newpath))
