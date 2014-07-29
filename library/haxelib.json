@@ -4,10 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Added NdllTools class (smart search for ndll files). Added Process.runDetached() method.",
-  "version": "1.6.0",
+  "releasenote": "Add Console.readLine().",
+  "version": "1.6.1",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
-  "dependencies": {
-    "stdlib": ""
-  }
+  "dependencies": {"stdlib":""}
 }
