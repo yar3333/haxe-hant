@@ -164,9 +164,9 @@ class Process
 	public var stderr(default,null) : haxe.io.Input;
 	public var stdin(default,null) : haxe.io.Output;
 
-	public function new(cmd:String, args:Array<String>, showWindowFlag=SW_SHOWNORMAL, useStdHandles=true) : Void
+	public function new(cmd:String, args:Array<String>, showWindowFlag=SW_HIDE, useStdHandles=true) : Void
 	{
-		p = try _run(untyped cmd.__s,neko.Lib.haxeToNeko(args), showWindowFlag, useStdHandles) catch( e : Dynamic ) throw "Process creation failure : "+cmd;
+		p = try _run(untyped cmd.__s, neko.Lib.haxeToNeko(args), showWindowFlag, useStdHandles) catch( e : Dynamic ) throw "Process creation failure : "+cmd;
 		if (useStdHandles)
 		{
 			stdin = new Stdin(p);
