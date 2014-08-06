@@ -224,13 +224,18 @@ class FlashDevelopProject
 		return null;
 	}
 	
-	public function getBuildParams(platform:String, destPath:String, addDefines:Array<String>, ?removeDefines:Array<String>) : Array<String>
+	public function getBuildParams(platform:String, destPath:String, addDefines:Array<String>, removeDefines:Array<String>, libs:Array<String>) : Array<String>
 	{
         var params = new Array<String>();
         
 		for (name in libPaths.keys())
         {
 			params.push("-lib"); params.push(name);
+		}
+		
+		for (name in libs)
+		{
+			if (!libPaths.exists(name)) params.push("-lib"); params.push(name);
 		}
 		
 		for (path in classPaths)
