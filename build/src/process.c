@@ -154,7 +154,11 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 			CloseHandle(eread);
 			CloseHandle(iwrite);
 			
-			if (!CreateProcess(NULL,val_string(sargs),NULL,NULL,TRUE,0,NULL,NULL,&sinf,&p->pinf)) neko_error();
+			if (!CreateProcess(NULL,val_string(sargs),NULL,NULL,TRUE,0,NULL,NULL,&sinf,&p->pinf))
+			{
+				//printf("CreateProcess error code = %i\n", GetLastError());
+				neko_error();
+			}
 			
 			// close unused pipes
 			CloseHandle(sinf.hStdOutput);
@@ -165,7 +169,7 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 		{
 			if (!CreateProcess(NULL,val_string(sargs),NULL,NULL,FALSE,0,NULL,NULL,&sinf,&p->pinf))
 			{
-				printf("error = %i\n", GetLastError());
+				//printf("CreateProcess error code = %i\n", GetLastError());
 				neko_error();
 			}
 		}
