@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Add Console.readLine().",
-  "version": "1.6.1",
+  "releasenote": "Process.run params: showWindowFlag & useStdHandles.\nFlashDevelopProject.getBuildParams(): additional libs support.\nConsole.readLine() fix.\nRecompile for win32 & linux32 & linux64.",
+  "version": "1.7.0",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
