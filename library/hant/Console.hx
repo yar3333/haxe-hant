@@ -22,8 +22,11 @@ class Console
 			if (c == 13) break;
 			if (c == 8)
 			{
-				if (s.length > 0) s = s.substr(0, s.length - 1);
-				Lib.print(String.fromCharCode(8) + " " + String.fromCharCode(8));
+				if (s.length > 0)
+				{
+					s = s.substr(0, s.length - 1);
+					Lib.print(String.fromCharCode(8) + " " + String.fromCharCode(8));
+				}
 			}
 			else
 			{
