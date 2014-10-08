@@ -104,7 +104,7 @@ class CmdOptions
 			{
 				var helpLines = opt.help.split("\n");
 				s += helpLines.shift() + "\n";
-				s += Lambda.map(helpLines, function(s) return prefix + "".lpad(" ", maxSwitchLength + 1) + s).join("\n");
+				s += Lambda.map(helpLines, function(s) return prefix + "".lpad(" ", maxSwitchLength + 1) + s + "\n").join("");
 			}
 			else
 			{
