@@ -233,7 +233,7 @@ class CmdOptions
 		{
 			if (options[i].switches == null)
 			{
-				paramWoSwitchIndex = i + 1;
+				if (!options[i].repeatable) paramWoSwitchIndex = i + 1;
 				return options[i];
 			}
 		}
