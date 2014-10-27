@@ -140,7 +140,7 @@ class CmdOptions
 	{
 		var arg = args.shift();
 		
-		if (arg.substr(0, 1) == "-")
+		if (arg.substr(0, 1) == "-" && arg != "-" && arg != "--")
 		{
 			arg = ~/^(--?.+)=(.+)$/.map(arg, function(r)
 			{
