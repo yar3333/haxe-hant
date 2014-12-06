@@ -42,12 +42,12 @@ PathTools.makeNative("c:/mydir/file/") // => "c:\\mydir\\file\\" for Windows, no
 Process
 -------
 ```haxe
-// Synchronously execute a process (stdlib Process.run() is more stable than native):
+// Synchronously execute a process & read output (this method is more stable than standard sys.io.Process.run()):
 var r = Process.run("haxe", [ "myoption" ]);
 r.exitCode // exit code as int
 r.output   // stdout as string
 r.error    // stderr as string
 
 // Start a process detached, so you can finish parent process and keep child alive:
-Process.runDetached("myproc.exe", [ "--opt" ]);
+Process.runDetached("myproc.exe", [ "myoption" ]);
 ```
