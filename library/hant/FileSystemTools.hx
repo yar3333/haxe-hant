@@ -243,6 +243,12 @@ class FileSystemTools
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	public function copyFile(src:String, dest:String)
 	{
+		var destDir = Path.directory(dest);
+		if (destDir != "" && !FileSystem.exists(destDir))
+		{
+			createDirectory(destDir);
+		}
+		
 		if (Sys.systemName() == "Windows" && NdllTools.getPath("hant") != null)
 		{
 			if (copy_file_preserving_attributes == null)
