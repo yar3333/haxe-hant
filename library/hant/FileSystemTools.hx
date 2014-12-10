@@ -6,7 +6,7 @@ import sys.io.File;
 import sys.io.Process;
 using StringTools;
 
-class FileSystemTools 
+class FileSystemTools
 {
     var log : Log;
 
@@ -24,11 +24,11 @@ class FileSystemTools
 				for (file in FileSystem.readDirectory(path))
 				{
 					var isDir : Bool = null;
-					try 
+					try
 					{
 						isDir = FileSystem.isDirectory(path + "/" + file);
 					}
-					catch (e:Dynamic) 
+					catch (e:Dynamic)
 					{
 						log.trace("ERROR: FileSystem.isDirectory('" + path + "/" + file + "')");
 					}
@@ -113,7 +113,7 @@ class FileSystemTools
 				
                 if (!FileSystem.isDirectory(path))
 				{
-					if (FileSystem.exists(newpath))
+					if (FileSystem.exists(newpath) && !isSamePaths(path, newpath))
 					{
 						FileSystem.deleteFile(newpath);
 					}
@@ -121,7 +121,7 @@ class FileSystemTools
 				}
 				else
 				{
-					if (FileSystem.exists(newpath))
+					if (FileSystem.exists(newpath) && !isSamePaths(path, newpath))
 					{
 						FileSystem.deleteDirectory(newpath);
 					}
@@ -296,4 +296,11 @@ class FileSystemTools
 		File.copy(src, dest);
 	}
 	#end
+	
+	function isSamePaths(pathA:String, pathB:String)
+	{
+		pathA = FileSystem.fullPath(pathA);
+		pathB = FileSystem.fullPath(pathB);
+		return pathA == pathB || pathA.toLowerCase() == pathB.toLowerCase() && Sys.systemName() == "Windows";
+	}
 }
