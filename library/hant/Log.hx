@@ -45,7 +45,7 @@ class Log
         }
     }
     
-    public function finishOk()
+    public function finishOk(text="OK")
     {
         if (depth < depthLimit)
         {
@@ -53,7 +53,7 @@ class Log
 			{
 				if (!inBlock) print(indent(ind));
 				ind--;
-				println("[OK]");
+				println("[" + text + "]");
 				inBlock = false;
 			}
         }
@@ -61,7 +61,7 @@ class Log
         depth--;
     }
     
-    public function finishFail(?exceptionToThrow:Dynamic)
+    public function finishFail(text="FAIL", ?exceptionToThrow:Dynamic)
     {
         if (depth < depthLimit)
         {
@@ -69,7 +69,7 @@ class Log
 			{
 				if (!inBlock) print(indent(ind));
 				ind--;
-				println("[FAIL]");
+				println("[" + text + "]");
 				inBlock = false;
 			}
         }
