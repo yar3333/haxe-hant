@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Bugfixes.",
-  "version": "1.7.1",
+  "releasenote": "CmdOptions: process \"-\" and \"--\" options fix. copyFile: create dest dir. Rename on same path bugfix. Added optional text to finishOk/finishFail methods.",
+  "version": "1.7.2",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
