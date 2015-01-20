@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko"],
   "description": "Library with ant-like methods.",
   "contributors": ["yar3333"],
-  "releasenote": "Mac64 support.",
-  "version": "1.7.3",
+  "releasenote": "FlashDevelopProject refactoring.",
+  "version": "2.0.0",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
