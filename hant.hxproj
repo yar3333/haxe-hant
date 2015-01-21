@@ -22,9 +22,10 @@
   <build>
     <option directives="" />
     <option flashStrict="False" />
+    <option noInlineOnDebug="False" />
     <option mainClass="Main" />
     <option enabledebug="True" />
-    <option additional="" />
+    <option additional="--macro include('hant')" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
@@ -38,6 +39,7 @@
   <hiddenPaths>
     <hidden path="bin" />
     <hidden path="library.zip" />
+    <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />
