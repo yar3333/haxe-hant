@@ -6,12 +6,6 @@ import hant.NdllTools;
 
 class HantTest extends haxe.unit.TestCase
 {
-    public function testSimple()
-    {
-		var fs = new FileSystemTools(new hant.Log(5));
-		assertTrue(fs != null);
-    }
-	
 	public function testCmdOptions()
 	{
 		var parser = new CmdOptions();

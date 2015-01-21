@@ -5,7 +5,7 @@ using StringTools;
 
 class Haxe
 {
-	public static function getCompilerPath()
+	public static function getPath()
     {
         var r = Sys.getEnv("HAXEPATH");
         
@@ -28,4 +28,30 @@ class Haxe
         
         return r;
     }
+	
+	/**
+	 * Run haxe compiler. If port specified, then ensure running haxe compiler server on that port.
+	 */
+	public static function run(params:Array<String>, port=0, dir=".", verbose=true) : Int
+	{
+		if (port != 0)
+		{
+			var s = new sys.net.Socket();
+			try
+			{
+				s.connect(new sys.net.Host("127.0.0.1"), port);
+				s.close();
+			}
+			catch (e:Dynamic)
+			{
+				new sys.io.Process(getPath(), [ "--wait", Std.string(port) ]);
+				Sys.sleep(1);
+			}
+			params = [ "--cwd", FileSystem.fullPath(dir) ,"--connect", Std.string(port) ].concat(params);
+		}
+		
+		var r = Process.run(getPath(), params, verbose);
+		return r.exitCode;
+	}
+	
 }

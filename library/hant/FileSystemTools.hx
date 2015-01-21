@@ -1,6 +1,7 @@
 package hant;
 
 import haxe.io.Path;
+import stdlib.Exception;
 import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
@@ -8,14 +9,7 @@ using StringTools;
 
 class FileSystemTools
 {
-    var log : Log;
-
-    public function new(?log:Log)
-    {
-        this.log = log != null ? log : new Log(0);
-    }
-    
-    public function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool) : Void
+    public static function findFiles(path:String, ?onFile:String->Void, ?onDir:String->Bool, verbose=true) : Void
     {
 		if (FileSystem.exists(path))
 		{
@@ -30,7 +24,7 @@ class FileSystemTools
 					}
 					catch (e:Dynamic)
 					{
-						log.trace("ERROR: FileSystem.isDirectory('" + path + "/" + file + "')");
+						if (verbose) Log.echo("ERROR: FileSystem.isDirectory('" + path + "/" + file + "')");
 					}
 					
 					if (isDir == true)
@@ -39,7 +33,7 @@ class FileSystemTools
 						{
 							if (onDir == null || onDir(path + "/" + file))
 							{
-								findFiles(path + "/" + file, onFile, onDir);
+								findFiles(path + "/" + file, onFile, onDir, verbose);
 							}
 						}
 					}
@@ -57,59 +51,49 @@ class FileSystemTools
 		}
     }
     
-    public function createDirectory(path:String)
+    public static function createDirectory(path:String, verbose=true)
     {
-        if (!FileSystem.exists(path))
+		path = PathTools.normalize(path);
+		
+        if (path != "" && !FileSystem.exists(path))
 		{
-			log.start("Create directory '" + path + "'");
+			if (verbose) Log.start("Create directory '" + path + "'");
 			try
 			{
-				path = PathTools.normalize(path);
-				var dirs : Array<String> = path.split("/");
-				for (i in 0...dirs.length)
-				{
-					var dir = dirs.slice(0, i + 1).join("/");
-					if (!dir.endsWith(":"))
-					{
-						if (!FileSystem.exists(dir))
-						{
-							FileSystem.createDirectory(dir);
-						}
-					}
-				}
-				log.finishOk();
+				FileSystem.createDirectory(path);
+				if (verbose) Log.finishSuccess();
 			}
 			catch (message:String)
 			{
-				log.finishFail(message);
+				if (verbose) Log.finishFail(message);
+				Exception.rethrow(message);
 			}
 		}
     }
     
-    public function copyFolderContent(src:String, dest:String)
+    public static function copyFolderContent(src:String, dest:String, verbose=true)
     {
 		src = PathTools.normalize(src);
         dest = PathTools.normalize(dest);
 		
-		log.start("Copy directory '" + src + "' => '" + dest + "'");
+		if (verbose) Log.start("Copy directory '" + src + "' => '" + dest + "'");
         
 		findFiles(src, function(path)
 		{
-			copyFile(path, dest + path.substr(src.length));
+			copyFile(path, dest + path.substr(src.length), verbose);
 		});
 		
-		log.finishOk();
+		if (verbose) Log.finishSuccess();
     }
 	
-	public function rename(path:String, newpath:String)
+	public static function rename(path:String, newpath:String, verbose=true)
     {
-        log.start("Rename '" + path + "' => '" + newpath + "'");
+        if (verbose) Log.start("Rename '" + path + "' => '" + newpath + "'");
         try
         {
             if (FileSystem.exists(path))
             {
-				var dir = haxe.io.Path.directory(newpath);
-				if (dir != "") createDirectory(dir);
+				createDirectory(Path.directory(newpath), false);
 				
                 if (!FileSystem.isDirectory(path))
 				{
@@ -132,19 +116,20 @@ class FileSystemTools
             {
                 throw "File '" + path + "' not found.";
             }
-            log.finishOk();
+            if (verbose) Log.finishSuccess();
         }
         catch (message:String)
         {
-            log.finishFail(message);
+			if (verbose) Log.finishFail(message);
+			Exception.rethrow(message);
         }
     }
     
-    public function deleteDirectory(path:String)
+    public static function deleteDirectory(path:String, verbose=true)
     {
         if (FileSystem.exists(path))
 		{
-			log.start("Delete directory '" + path + "'");
+			if (verbose) Log.start("Delete directory '" + path + "'");
 			try
 			{
 				for (file in FileSystem.readDirectory(path))
@@ -160,48 +145,50 @@ class FileSystemTools
 				}
 
 				FileSystem.deleteDirectory(path);
-				log.finishOk();
+				if (verbose) Log.finishSuccess();
 			}
 			catch (message:String)
 			{
-				log.finishFail(message);
+				if (verbose) Log.finishFail(message);
+				Exception.rethrow(message);
 			}
 		}
     }
 	
-    public function deleteFile(path:String)
+    public static function deleteFile(path:String, verbose=true)
     {
         if (FileSystem.exists(path))
 		{
-			log.start("Delete file '" + path + "'");
+			if (verbose) Log.start("Delete file '" + path + "'");
 			try
 			{
 				FileSystem.deleteFile(path);
-				log.finishOk();
+				if (verbose) Log.finishSuccess();
 			}
 			catch (message:String)
 			{
-				log.finishFail(message);
+				if (verbose) Log.finishFail(message);
+				Exception.rethrow(message);
 			}
 		}
     }
 	
-	public function deleteAny(path:String)
+	public static function deleteAny(path:String, verbose=true)
 	{
 		if (FileSystem.exists(path))
 		{
 			if (FileSystem.isDirectory(path))
 			{
-				deleteDirectory(path);
+				deleteDirectory(path, verbose);
 			}
 			else
 			{
-				deleteFile(path);
+				deleteFile(path, verbose);
 			}
 		}
 	}
 	
-	public function restoreFileTimes(src:String, dest:String, ?filter:EReg)
+	public static function restoreFileTimes(src:String, dest:String, ?filter:EReg, verbose=true)
 	{
 		findFiles(src, function(srcFile)
 		{
@@ -210,13 +197,13 @@ class FileSystemTools
 				var destFile = dest + srcFile.substr(src.length);
 				if (FileSystem.exists(destFile) && File.getContent(srcFile) == File.getContent(destFile))
 				{
-					rename(srcFile, destFile);
+					rename(srcFile, destFile, verbose);
 				}
 			}
-		});
+		}, verbose);
 	}
     
-	public function getHiddenFileAttribute(path:String) : Bool
+	public static function getHiddenFileAttribute(path:String) : Bool
 	{
 		if (Sys.systemName() == "Windows")
 		{
@@ -231,7 +218,7 @@ class FileSystemTools
 		return false;
 	}
 	
-	public function setHiddenFileAttribute(path:String, hidden:Bool) : Void
+	public static function setHiddenFileAttribute(path:String, hidden:Bool) : Void
 	{
 		if (Sys.systemName() == "Windows")
 		{
@@ -241,13 +228,9 @@ class FileSystemTools
 	
 	#if neko
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
-	public function copyFile(src:String, dest:String)
+	public static function copyFile(src:String, dest:String, verbose:Bool)
 	{
-		var destDir = Path.directory(dest);
-		if (destDir != "" && !FileSystem.exists(destDir))
-		{
-			createDirectory(destDir);
-		}
+		createDirectory(Path.directory(dest), false);
 		
 		if (Sys.systemName() == "Windows" && NdllTools.getPath("hant") != null)
 		{
@@ -291,13 +274,13 @@ class FileSystemTools
 		}
 	}
 	#else
-	public inline function copyFile(src:String, dest:String) : Void
+	public static inline function copyFile(src:String, dest:String) : Void
 	{
 		File.copy(src, dest);
 	}
 	#end
 	
-	function isSamePaths(pathA:String, pathB:String)
+	static function isSamePaths(pathA:String, pathB:String)
 	{
 		pathA = FileSystem.fullPath(pathA);
 		pathB = FileSystem.fullPath(pathB);

@@ -1,5 +1,7 @@
 package hant;
 
+import haxe.io.Path;
+import haxe.xml.Fast;
 import stdlib.Exception;
 import stdlib.Std;
 import sys.FileSystem;
@@ -92,7 +94,7 @@ class FlashDevelopProject
 	
 	static function getBinPath(xml:Xml) : String
 	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
+		var fast = new Fast(xml.firstElement());
 		
 		if (fast.hasNode.output)
 		{
@@ -290,5 +292,12 @@ class FlashDevelopProject
 		params = params.concat(additionalCompilerOptions);
 		
 		return params;
+	}
+	
+	public function build(?addParams:Array<String>, port=0, ?log:Bool)
+	{
+		if (addParams == null) addParams = [];
+		
+		Haxe.run(getBuildParams().concat(addParams), port, FileSystem.fullPath(Path.directory(projectFilePath)), log);
 	}
 }

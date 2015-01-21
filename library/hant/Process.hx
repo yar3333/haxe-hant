@@ -183,12 +183,9 @@ class Process
 
 	public function kill() : Void _kill(p);
 
-	public static function run(fileName:String, args:Array<String>, ?input:String, verbose=false, ?log:Log) : { exitCode:Int, output:String, error:String }
+	public static function run(fileName:String, args:Array<String>, ?input:String, echo=true, verbose=true) : { exitCode:Int, output:String, error:String }
 	{
-		if (log != null)
-		{
-			log.trace(fileName.replace("/", "\\") + " " + args.join(" "));
-		}		
+		if (verbose) Log.echo(fileName.replace("/", "\\") + " " + args.join(" "));
 		
 		var p = new Process(fileName, args);
 		
@@ -214,7 +211,7 @@ class Process
 						{
 							var bufStr = buffer.toString();
 							var n = bufStr.lastIndexOf("\n");
-							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+							if (echo) Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
 						}
 						buffer.add(c);
 					}
@@ -240,7 +237,7 @@ class Process
 						{
 							var bufStr = buffer.toString();
 							var n = bufStr.lastIndexOf("\n");
-							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+							if (echo) Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
 						}
 						buffer.add(c);
 					}
@@ -258,10 +255,7 @@ class Process
 		
 		if (exitCode != 0)
 		{
-			if (log != null)
-			{
-				log.trace("Run error: " + exitCode);
-			}
+			if (verbose) Log.echo("Run error: " + exitCode);
 		}
 		
 		return { exitCode:exitCode, output:output.replace("\r", ""), error:error };

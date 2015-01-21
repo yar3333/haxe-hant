@@ -6,8 +6,44 @@ import neko.Lib;
 import php.Lib;
 #end
 
-class Log 
+/**
+ * Global log class.
+ * Using:
+ *		Log.instance = new Log(5); // at the start of you application; 5 - details level (messages with greater nesting level will be ignored)
+ * 		...
+ *		Log.start("MyProcessStartMessage");
+ * 		...
+ * 		Log.echo("myMessage");
+ * 		...
+ * 		if (good) Log.finishSuccess(); // finish Process
+ * 		else      Log.finishFail();
+ */
+class Log
 {
+	public static var instance : Log;
+	
+    public static function start(message:String, level=0)
+    {
+        if (instance != null) instance.startInner(message, level);
+    }
+    
+    public static function finishSuccess(?text:String)
+    {
+		if (instance != null) instance.finishSuccessInner(text);
+    }
+    
+    public static function finishFail(?text:String, ?exceptionToThrow:Dynamic)
+    {
+		if (instance != null) instance.finishFailInner(text, exceptionToThrow);
+    }
+	
+	public static function echo(message:String, level=0)
+	{
+		if (instance != null) instance.echoInner(message, level);
+	}
+	
+	//{ instance fields ====================================================================================
+	
     var depthLimit : Int;
     var levelLimit : Int;
     var depth : Int;
@@ -25,7 +61,7 @@ class Log
 		shown = [];
     }
     
-    public function start(message:String, level=0)
+    function startInner(message:String, level=0)
     {
         depth++;
         if (depth < depthLimit)
@@ -45,7 +81,7 @@ class Log
         }
     }
     
-    public function finishOk(text="OK")
+    function finishSuccessInner(text="OK")
     {
         if (depth < depthLimit)
         {
@@ -61,7 +97,7 @@ class Log
         depth--;
     }
     
-    public function finishFail(text="FAIL", ?exceptionToThrow:Dynamic)
+    function finishFailInner(text="FAIL", ?exceptionToThrow:Dynamic)
     {
         if (depth < depthLimit)
         {
@@ -82,7 +118,7 @@ class Log
 		}
     }
 	
-	public function trace(message:String, level=0)
+	function echoInner(message:String, level=0)
 	{
 		if (depth < depthLimit)
 		{
@@ -109,4 +145,6 @@ class Log
 	{
 		Lib.println(s);
 	}
+	
+	//}
 }
