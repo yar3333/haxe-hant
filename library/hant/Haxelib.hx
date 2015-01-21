@@ -5,12 +5,16 @@ using stdlib.StringTools;
 
 class Haxelib
 {
-	public static function getPaths(libs:Array<String>) : Map<String,String>
+	public static function getPaths(libs:Array<String>, ?r:Map<String, String>) : Map<String,String>
 	{
-		var r = new Map<String,String>();
-		
-		var output = Process.run("haxelib", [ "path" ].concat(libs)).output;
+		if (r == null) r = new Map<String,String>();
+
+		libs = libs.filter(function(lib) return !r.exists(lib));
+
+		var output = Process.run("haxelib", [ "path" ].concat(libs), null, false, false).output;
 		var lines = output.split("\n");
+		
+		var count = 0;
 		
 		for (i in 0...lines.length)
 		{
@@ -23,6 +27,7 @@ class Haxelib
 					if (path == "") path = ".";
 					var p = path.replace("\\", "/").rtrim("/") + "/";
 					r.set(lib, p);
+					count++;
 				}
 			}
 		}
