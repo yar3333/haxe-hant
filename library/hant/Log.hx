@@ -9,7 +9,7 @@ import php.Lib;
 /**
  * Global log class.
  * Using:
- *		Log.instance = new Log(5); // at the start of you application; 5 - details level (messages with greater nesting level will be ignored)
+ *		Log.instance = new Log(5); // init log at the start of your application; 5 - nesting level limit (messages with greater nesting level will be ignored)
  * 		...
  *		Log.start("MyProcessStartMessage");
  * 		...
