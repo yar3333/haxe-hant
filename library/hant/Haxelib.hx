@@ -10,6 +10,8 @@ class Haxelib
 		if (r == null) r = new Map<String,String>();
 
 		libs = libs.filter(function(lib) return !r.exists(lib));
+		
+		if (libs.length == 0) return r;
 
 		var output = Process.run("haxelib", [ "path" ].concat(libs), null, false, false).output;
 		var lines = output.split("\n");
@@ -32,7 +34,7 @@ class Haxelib
 			}
 		}
 		
-		if (Lambda.count(r) != libs.length)
+		if (count != libs.length)
 		{
 			throw new Exception("haxelib error: haxelib path " + libs.join(" ") + "\n" + output);
 		}
