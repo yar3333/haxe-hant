@@ -1,5 +1,11 @@
-Ant-like methods on haxe sys platforms (neko / php / cpp)
-=========================================================
+Ant-like methods primary for haxe sys platforms (neko / php / cpp)
+==================================================================
+
+Also allow build FlashDevelop haxe projects:
+```shell
+# find *.hxproj in current dir & parse it & call haxe compiler
+haxelib run hant fdbuild 
+```
 
 CmdOptions
 ----------
@@ -50,4 +56,27 @@ r.error    // stderr as string
 
 // Start a process detached, so you can finish parent process and keep child alive:
 Process.runDetached("myproc.exe", [ "myoption" ]);
+```
+
+Log
+---
+Helper to print beautiful log messages like Apache Ant produce. Support nesting level limit & detail level specification.
+```haxe
+Log.instance = new Log(5); // init log at the start of your application; 5 - nesting level limit (messages with greater nesting level will be ignored)
+...
+Log.start("MyProcessStartMessage");
+...
+Log.echo("myMessage");
+...
+if (good) Log.finishSuccess(); // finish Process
+else      Log.finishFail();
+```
+
+FlashDevelopProject
+-------------------
+Helper to parse *.hxproj files.
+```haxe
+var project = FlashDevelopProject.load("myProject.hxproj");
+trace(project.libs);
+project.build();
 ```
