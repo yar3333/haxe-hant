@@ -32,7 +32,7 @@ class Haxe
 	/**
 	 * Run haxe compiler. If port specified, then ensure running haxe compiler server on that port.
 	 */
-	public static function run(params:Array<String>, port=0, dir=".", verbose=true) : Int
+	public static function run(params:Array<String>, port=0, dir=".", echo=true, verbose=true) : Int
 	{
 		if (port != 0)
 		{
@@ -50,7 +50,7 @@ class Haxe
 			params = [ "--cwd", FileSystem.fullPath(dir) ,"--connect", Std.string(port) ].concat(params);
 		}
 		
-		var r = Process.run(getPath(), params, verbose);
+		var r = Process.run(getPath(), params, echo, verbose);
 		return r.exitCode;
 	}
 	
