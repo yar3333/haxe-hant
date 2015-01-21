@@ -10,38 +10,32 @@ using stdlib.StringTools;
 
 class FlashDevelopProject 
 {
+	static var libsPathCache = new Map<String,String>();
+	
 	public var projectFilePath : String;
 	public var binPath : String;
 	public var classPaths : Array<String>;
-	public var libs : Map<String,String>;
+	public var libs : Array<String>;
 	public var isDebug : Bool;
 	public var platform : String;
 	public var additionalCompilerOptions : Array<String>;
 	public var directives : Array<String>;
+	public var mainClass : String;
 	
-	public var allClassPaths(default, null) : Array<String>;
+	public var allClassPaths(get, never) : Array<String>;
+	function get_allClassPaths() return [ Haxelib.getStdLibPath() ].concat(Lambda.array(getLibPaths()).concat(classPaths));
 	
-	public function new(projectFilePath:String, binPath:String, classPaths:Array<String>, libs:Array<String>, isDebug:Bool, platform:String, additionalCompilerOptions:Array<String>, directives:Array<String>)
+	public function new(projectFilePath:String, binPath:String, classPaths:Array<String>, libs:Array<String>, isDebug:Bool, platform:String, additionalCompilerOptions:Array<String>, directives:Array<String>, mainClass:String)
 	{
 		this.projectFilePath = projectFilePath;
 		this.binPath = binPath;
 		this.classPaths  = classPaths;
-		this.libs = Haxelib.getPaths(libs);
+		this.libs = libs;
 		this.isDebug = isDebug;
 		this.platform = platform;
 		this.additionalCompilerOptions = additionalCompilerOptions;
 		this.directives = directives;
-		
-		allClassPaths = [ Haxelib.getStdLibPath() ].concat(Lambda.array(this.libs).concat(classPaths));
-	}
-	
-	public function addLibs(libs:Array<String>)
-	{
-		var paths = Haxelib.getPaths(libs);
-		for (lib in libs)
-		{
-			this.libs.set(lib, paths.get(lib));
-		}
+		this.mainClass = mainClass;
 	}
 	
 	public static function load(path:String) : FlashDevelopProject
@@ -64,9 +58,18 @@ class FlashDevelopProject
 			getIsDebug(xml),
 			getPlatform(xml),
 			getAdditionalCompilerOptions(xml),
-			getDirectives(xml)
+			getDirectives(xml),
+			getMainClass(xml)
 		);
 
+	}
+	
+	public function getLibPaths() : Map<String, String>
+	{
+		Haxelib.getPaths(libs, libsPathCache);
+		var r = new Map<String, String>();
+		for (lib in libs) r.set(lib, libsPathCache.get(lib));
+		return r;
 	}
 	
 	static function findProjectFile(dir:String) : String
@@ -225,6 +228,22 @@ class FlashDevelopProject
 		return [];
 	}
 	
+	static function getMainClass(xml:Xml) : String
+	{
+		var fast = new haxe.xml.Fast(xml.firstElement());
+		if (fast.hasNode.build)
+		{
+			for (elem in fast.node.build.elements)
+			{
+				if (elem.name == 'option' && elem.has.mainClass)
+				{
+					return elem.att.mainClass;
+				}
+			}
+		}
+		return "";
+	}
+	
 	public function findFile(relativeFilePath:String) : String
 	{
 		var i = allClassPaths.length - 1;
@@ -245,16 +264,22 @@ class FlashDevelopProject
 		if (addDefines == null) addDefines = [];
 		if (addLibs == null) addLibs = [];
 		
+		platform = platform.toLowerCase();
+		if (platform == "javascript") platform = "js";
+		
         var params = new Array<String>();
         
-		for (name in libs.keys())
+		for (name in libs)
         {
 			params.push("-lib"); params.push(name);
 		}
 		
 		for (name in addLibs)
 		{
-			if (!libs.exists(name)) params.push("-lib"); params.push(name);
+			if (libs.indexOf(name) < 0)
+			{
+				params.push("-lib"); params.push(name);
+			}
 		}
 		
 		for (path in classPaths)
@@ -273,8 +298,10 @@ class FlashDevelopProject
 			params.push("--no-output");
 		}
 		
-		params.push("-main");
-		params.push("Main");
+		if (mainClass != null && mainClass != "")
+		{
+			params.push("-main"); params.push(mainClass);
+		}
 		
 		if (isDebug)
 		{
