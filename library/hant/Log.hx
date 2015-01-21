@@ -32,9 +32,9 @@ class Log
 		if (instance != null) instance.finishSuccessInner(text);
     }
     
-    public static function finishFail(?text:String, ?exceptionToThrow:Dynamic)
+    public static function finishFail(?text:String)
     {
-		if (instance != null) instance.finishFailInner(text, exceptionToThrow);
+		if (instance != null) instance.finishFailInner(text);
     }
 	
 	public static function echo(message:String, level=0)
@@ -93,13 +93,12 @@ class Log
 				inBlock = false;
 			}
         }
-        
         depth--;
     }
     
-    function finishFailInner(text="FAIL", ?exceptionToThrow:Dynamic)
+    function finishFailInner(text="FAIL")
     {
-        if (depth < depthLimit)
+		if (depth < depthLimit)
         {
             if (shown.pop())
 			{
@@ -109,13 +108,7 @@ class Log
 				inBlock = false;
 			}
         }
-        
         depth--;
-		
-		if (exceptionToThrow != null)
-		{
-			stdlib.Exception.rethrow(exceptionToThrow);
-		}
     }
 	
 	function echoInner(message:String, level=0)

@@ -226,12 +226,26 @@ class FileSystemTools
 		}
 	}
 	
+	public static function copyFile(src:String, dest:String, verbose=true)
+	{
+		if (verbose) Log.start("Copy " + src + " => " + dest);
+		try
+		{
+			createDirectory(Path.directory(dest), false);
+			nativeCopyFile(src, dest);
+		}
+		catch (e:Dynamic)
+		{
+			if (verbose) Log.finishFail();
+			Exception.rethrow(e);
+		}
+		if (verbose) Log.finishSuccess();
+	}
+	
 	#if neko
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
-	public static function copyFile(src:String, dest:String, verbose:Bool)
+	static function nativeCopyFile(src:String, dest:String)
 	{
-		createDirectory(Path.directory(dest), false);
-		
 		if (Sys.systemName() == "Windows" && NdllTools.getPath("hant") != null)
 		{
 			if (copy_file_preserving_attributes == null)
@@ -240,32 +254,15 @@ class FileSystemTools
 			}
 			
 			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.makeNative(src)), neko.Lib.haxeToNeko(PathTools.makeNative(dest))));
-			
-			if (r != 0)
+			switch (r)
 			{
-				if (r == 1)
-				{
-					throw "Error open source file ('" + src + "').";
-				}
-				else
-				if (r == 2)
-				{
-					throw "Error open dest file ('" + dest + "').";
-				}
-				else
-				if (r == 3)
-				{
-					throw "Error get attributes from source file ('" + src + "').";
-				}
-				else
-				if (r == 4)
-				{
-					throw "Error set attributes to dest file ('" + dest + "').";
-				}
-				else
-				{
-					throw "Error code is " + r + ".";
-				}
+				case 0: // nothing to do
+				case 1: throw "Error open source file ('" + src + "').";
+				case 2: throw "Error open dest file ('" + dest + "').";
+				case 3: throw "Error get attributes from source file ('" + src + "').";
+				case 4: throw "Error set attributes to dest file ('" + dest + "').";
+				case _: throw "Error code is " + r + ".";
+				
 			}
 		}
 		else
@@ -274,7 +271,7 @@ class FileSystemTools
 		}
 	}
 	#else
-	public static inline function copyFile(src:String, dest:String) : Void
+	static inline function nativeCopyFile(src:String, dest:String)
 	{
 		File.copy(src, dest);
 	}
