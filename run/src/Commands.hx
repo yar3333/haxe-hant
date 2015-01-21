@@ -19,7 +19,7 @@ class Commands
 	{
 		var options = new CmdOptions();
 		
-		options.add("--port", 0, "Haxe compiler server port (speedup recompiling). Server will start if not running.");
+		options.add("port", 0, [ "--port" ], "Haxe compiler server port (speedup recompiling). Server will start if not running.");
 		options.add("path", "", "Path to dir or *.hxproj file. If path is dir, then first found *.hxproj file in that dir will be used.");
 		
 		if (args.length != 1 || args[0] != "--help")

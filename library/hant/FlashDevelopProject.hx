@@ -12,56 +12,116 @@ class FlashDevelopProject
 {
 	static var libsPathCache = new Map<String,String>();
 	
-	public var projectFilePath : String;
-	public var binPath : String;
-	public var classPaths : Array<String>;
-	public var libs : Array<String>;
-	public var isDebug : Bool;
-	public var platform : String;
-	public var additionalCompilerOptions : Array<String>;
-	public var directives : Array<String>;
-	public var mainClass : String;
+	public var projectFilePath = "";
+	
+	public var binPath = "";
+	public var classPaths : Array<String> = [];
+	public var libs : Array<String> = [];
+	public var isDebug = false;
+	public var platform = "";
+	public var additionalCompilerOptions : Array<String> = [];
+	public var directives : Array<String> = [];
+	public var mainClass = "";
+	public var preBuildCommand = "";
+	public var postBuildCommand = "";
+	public var alwaysRunPostBuild = false;
 	
 	public var allClassPaths(get, never) : Array<String>;
 	function get_allClassPaths() return [ Haxelib.getStdLibPath() ].concat(Lambda.array(getLibPaths()).concat(classPaths));
 	
-	public function new(projectFilePath:String, binPath:String, classPaths:Array<String>, libs:Array<String>, isDebug:Bool, platform:String, additionalCompilerOptions:Array<String>, directives:Array<String>, mainClass:String)
-	{
-		this.projectFilePath = projectFilePath;
-		this.binPath = binPath;
-		this.classPaths  = classPaths;
-		this.libs = libs;
-		this.isDebug = isDebug;
-		this.platform = platform;
-		this.additionalCompilerOptions = additionalCompilerOptions;
-		this.directives = directives;
-		this.mainClass = mainClass;
-	}
+	public function new() { }
 	
 	public static function load(path:String) : FlashDevelopProject
 	{
-		var projectFilePath = null;
+		var r = new FlashDevelopProject();
+		
+		r.projectFilePath = null;
 		if (path != null && (path == "" || FileSystem.exists(path)))
 		{
-			projectFilePath = path == "" || FileSystem.isDirectory(path) ? findProjectFile(path) : path;
+			r.projectFilePath = path == "" || FileSystem.isDirectory(path) ? findProjectFile(path) : path;
 		}
-		if (projectFilePath == null) return null;
+		if (r.projectFilePath == null) return null;
 		
-		var xml = Xml.parse(File.getContent(projectFilePath));
+		var xml = Xml.parse(File.getContent(r.projectFilePath));
+		var fast = new Fast(xml.firstElement());
 		
-		return new FlashDevelopProject
-		(
-			projectFilePath,
-			getBinPath(xml),
-			getClassPaths(xml),
-			getLibs(xml),
-			getIsDebug(xml),
-			getPlatform(xml),
-			getAdditionalCompilerOptions(xml),
-			getDirectives(xml),
-			getMainClass(xml)
-		);
-
+		if (fast.hasNode.output)
+		{
+			for (elem in fast.node.output.elements)
+			{
+				if (elem.name == "movie")
+				{
+					if (elem.has.bin) r.binPath = elem.att.bin;
+					else
+					if (elem.has.platform) r.platform = elem.att.platform.toLowerCase();
+				}
+			}
+		}
+		
+		if (fast.hasNode.classpaths)
+		{
+			for (elem in fast.node.classpaths.elements)
+			{
+				if (elem.name == 'class' && elem.has.path)
+				{
+					var path = PathTools.normalize(elem.att.path.trim());
+					if (path == "") path = ".";
+					r.classPaths.push(path);
+				}
+			}
+		}
+		
+		if (fast.hasNode.haxelib)
+		{
+			for (elem in fast.node.haxelib.elements)
+			{
+				if (elem.name == 'library' && elem.has.name)
+				{
+					r.libs.push(elem.att.name);
+				}
+			}
+		}
+		
+		if (fast.hasNode.build)
+		{
+			for (elem in fast.node.build.elements)
+			{
+				if (elem.name == 'option')
+				{
+					if (elem.has.enabledebug) r.isDebug = Std.bool(elem.att.enabledebug);
+					else
+					if (elem.has.directives)
+					{
+						var s = elem.att.directives.htmlUnescape().trim();
+						r.directives = s != "" ? ~/\s+/g.split(s) : [];
+					}
+					else
+					if (elem.has.mainClass) r.mainClass =  elem.att.mainClass;
+					else
+					if (elem.has.additional)
+					{
+						var s = elem.att.additional.htmlUnescape().trim();
+						r.additionalCompilerOptions = s != "" ? ~/\s+/g.split(s) : [];
+					}
+				}
+			}
+		}
+		
+		if (fast.hasNode.preBuildCommand)
+		{
+			r.preBuildCommand = fast.node.preBuildCommand.innerHTML.htmlUnescape().htmlUnescape();
+		}
+		
+		if (fast.hasNode.postBuildCommand)
+		{
+			r.postBuildCommand = fast.node.postBuildCommand.innerHTML.htmlUnescape().htmlUnescape();
+			if (fast.node.postBuildCommand.has.alwaysRun)
+			{
+				r.alwaysRunPostBuild = Std.bool(fast.node.postBuildCommand.att.alwaysRun);
+			}
+		}
+		
+		return r;
 	}
 	
 	public function getLibPaths() : Map<String, String>
@@ -70,178 +130,6 @@ class FlashDevelopProject
 		var r = new Map<String, String>();
 		for (lib in libs) r.set(lib, libsPathCache.get(lib));
 		return r;
-	}
-	
-	static function findProjectFile(dir:String) : String
-	{
-		dir = dir.trim();
-		if (dir == "") dir = ".";
-		dir = dir.replace("\\", "/").rtrim("/");
-		
-		var r = [];
-		for (file in FileSystem.readDirectory(dir))
-		{
-			if (file.endsWith(".hxproj") && !FileSystem.isDirectory(dir + "/" + file))
-			{
-				r.push(dir + "/" + file);
-			}
-		}
-		
-		if (r.length > 1)
-		{
-			throw new Exception("Several FlashDevelop project files in the '" + dir + "' directory found, so you must specify full path to file.");
-		}
-		
-		return r.length == 1 ? r[0] : null;
-	}
-	
-	static function getBinPath(xml:Xml) : String
-	{
-		var fast = new Fast(xml.firstElement());
-		
-		if (fast.hasNode.output)
-		{
-			for (elem in fast.node.output.elements)
-			{
-				if (elem.name == "movie" && elem.has.bin)
-				{
-					return elem.att.bin;
-				}
-			}
-		}
-		
-		return "bin";
-	}
-	
-    static function getClassPaths(xml:Xml) : Array<String>
-    {
-        var r = new Array<String>();
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		
-		if (fast.hasNode.classpaths)
-		{
-			var classpaths = fast.node.classpaths;
-			for (elem in classpaths.elements)
-			{
-				if (elem.name == 'class' && elem.has.path)
-				{
-					var path = elem.att.path.trim().replace('\\', '/').rtrim('/');
-					if (path == "")
-					{
-						path = ".";
-					}
-					r.push(path.rtrim("/") + "/");
-				}
-			}
-		}
-		
-		return r;
-    }
-	
-    static function getLibs(xml:Xml) : Array<String>
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		var libs = new Array<String>();
-		if (fast.hasNode.haxelib)
-		{
-			var haxelibs = fast.node.haxelib;
-			for (elem in haxelibs.elements)
-			{
-				if (elem.name == 'library' && elem.has.name)
-				{
-					libs.push(elem.att.name);
-				}
-			}
-		}
-		return libs;
-	}
-	
-	static function getIsDebug(xml:Xml) : Bool
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		if (fast.hasNode.build)
-		{
-			for (elem in fast.node.build.elements)
-			{
-				if (elem.name == 'option' && elem.has.enabledebug)
-				{
-					return Std.bool(elem.att.enabledebug);
-				}
-			}
-		}
-		return true;
-	}
-	
-	static function getPlatform(xml:Xml) : String
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		
-		if (fast.hasNode.output)
-		{
-			for (elem in fast.node.output.elements)
-			{
-				if (elem.name == "movie" && elem.has.platform)
-				{
-					return elem.att.platform.toLowerCase();
-				}
-			}
-		}
-		
-		return "";
-	}
-	
-	static function getDirectives(xml:Xml) : Array<String>
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		
-		if (fast.hasNode.build)
-		{
-			for (elem in fast.node.build.elements)
-			{
-				if (elem.name == "option" && elem.has.directives)
-				{
-					var s = elem.att.directives.replace("&#xA;", "\n").trim();
-					return s != "" ? ~/\s+/g.split(s) : [];
-				}
-			}
-		}
-		
-		return [];
-	}
-	
-	static function getAdditionalCompilerOptions(xml:Xml) : Array<String>
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		
-		if (fast.hasNode.build)
-		{
-			for (elem in fast.node.build.elements)
-			{
-				if (elem.name == "option" && elem.has.additional)
-				{
-					var s = elem.att.additional.replace("&#xA;", "\n").trim();
-					return s != "" ? ~/\s+/g.split(s) : [];
-				}
-			}
-		}
-		
-		return [];
-	}
-	
-	static function getMainClass(xml:Xml) : String
-	{
-		var fast = new haxe.xml.Fast(xml.firstElement());
-		if (fast.hasNode.build)
-		{
-			for (elem in fast.node.build.elements)
-			{
-				if (elem.name == 'option' && elem.has.mainClass)
-				{
-					return elem.att.mainClass;
-				}
-			}
-		}
-		return "";
 	}
 	
 	public function findFile(relativeFilePath:String) : String
@@ -321,10 +209,75 @@ class FlashDevelopProject
 		return params;
 	}
 	
-	public function build(?addParams:Array<String>, port=0, ?log:Bool)
+	public function build(?addParams:Array<String>, port=0, echo=true, verbose=true)
 	{
 		if (addParams == null) addParams = [];
 		
-		Haxe.run(getBuildParams().concat(addParams), port, FileSystem.fullPath(Path.directory(projectFilePath)), log);
+		var saveCwd : String = null;
+		if (projectFilePath != null && projectFilePath != "")
+		{
+			var dir = Path.directory(projectFilePath);
+			if (dir != "")
+			{
+				saveCwd = Sys.getCwd();
+				Sys.setCwd(dir);
+			}
+		}
+		
+		try
+		{
+			runCommands("Running Pre-Build Command Line...", preBuildCommand, echo, verbose);
+			
+			var r = Haxe.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose);
+			
+			if (r == 0 || alwaysRunPostBuild)
+			{
+				runCommands("Running Post-Build Command Line...", postBuildCommand, echo, verbose);
+			}
+		}
+		catch (e:Dynamic)
+		{
+			if (saveCwd != null) Sys.setCwd(saveCwd);
+			Exception.rethrow(e);
+		}
+		
+		if (saveCwd != null) Sys.setCwd(saveCwd);
+	}
+	
+	static function findProjectFile(dir:String) : String
+	{
+		dir = dir.trim();
+		if (dir == "") dir = ".";
+		dir = dir.replace("\\", "/").rtrim("/");
+		
+		var r = [];
+		for (file in FileSystem.readDirectory(dir))
+		{
+			if (file.endsWith(".hxproj") && !FileSystem.isDirectory(dir + "/" + file))
+			{
+				r.push(dir + "/" + file);
+			}
+		}
+		
+		if (r.length > 1)
+		{
+			throw new Exception("Several FlashDevelop project files in the '" + dir + "' directory found, so you must specify full path to file.");
+		}
+		
+		return r.length == 1 ? r[0] : null;
+	}
+	
+	static function runCommands(message:String, commandString:String, echo:Bool, verbose:Bool)
+	{
+		var commands = commandString.replace("\r\n", "\n").replace("\r", "\n").split("\n").map(std.StringTools.trim).filter(function(s) return s != "");
+		if (commands.length > 0)
+		{
+			if (verbose) Sys.println(message);
+			for (command in commands)
+			{
+				if (verbose) Sys.println("cmd: " + command);
+				Sys.command(command);
+			}
+		}
 	}
 }
