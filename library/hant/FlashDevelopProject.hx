@@ -14,6 +14,7 @@ class FlashDevelopProject
 	
 	public var projectFilePath = "";
 	
+	public var outputType = "Application";
 	public var binPath = "";
 	public var classPaths : Array<String> = [];
 	public var libs : Array<String> = [];
@@ -54,6 +55,8 @@ class FlashDevelopProject
 					if (elem.has.bin) r.binPath = elem.att.bin;
 					else
 					if (elem.has.platform) r.platform = elem.att.platform.toLowerCase();
+					else
+					if (elem.has.outputType) r.outputType = elem.att.outputType;
 				}
 			}
 		}
@@ -228,7 +231,9 @@ class FlashDevelopProject
 		{
 			runCommands("Running Pre-Build Command Line...", preBuildCommand, echo, verbose);
 			
-			var r = Haxe.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose);
+			var r = outputType == "Application"
+				? Haxe.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose)
+				: 0;
 			
 			if (r == 0 || alwaysRunPostBuild)
 			{
