@@ -3,7 +3,7 @@ package hant;
 import sys.FileSystem;
 using StringTools;
 
-class Haxe
+class HaxeCompiler
 {
 	public static function getPath()
     {
@@ -23,7 +23,7 @@ class Haxe
         
         if (!FileSystem.exists(r) || FileSystem.isDirectory(r))
         {
-            throw "Haxe compiler is not found (file '" + r + "' does not exist).";
+            throw "HaxeCompiler compiler is not found (file '" + r + "' does not exist).";
         }
         
         return r;
