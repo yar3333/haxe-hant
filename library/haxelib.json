@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko","sys","flashdevelop","log","logging"],
   "description": "Library with ant-like methods. Helpful classes for building console application",
   "contributors": ["yar3333"],
-  "releasenote": "FlashDevelopProject refactoring.",
-  "version": "2.0.0",
+  "releasenote": "Make Log & FileSystemTools methods static. FlashDevelopProject: mainClass & optimizations. New run command: \"haxelib run hant fdbuild\" - build your project using *.hxproj file. FlashDevelopProject.build().",
+  "version": "3.0.0",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
