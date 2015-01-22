@@ -19,6 +19,12 @@ class Commands
 	{
 		var options = new CmdOptions();
 		
+		options.add("outputPath", "", [ "--output-path", "-o" ], "Override output path.");
+		options.add("outputType", "", [ "--output-type", "-t" ], "Override output type ('Application' or 'CustomBuild').");
+		options.add("platform", "", [ "--platform", "-p" ], "Override target platform.");
+		options.add("mainClass", "", [ "--main-class", "-main" ], "Override main class.");
+		options.add("noPreBuild", false, [ "--no-prebuild", "-nopre" ], "Do not do pre-build step.");
+		options.add("noPostBuild", false, [ "--no-postbuild", "-nopost" ], "Do not do post-build step.");
 		options.add("port", 0, [ "--port" ], "Haxe compiler server port (speedup recompiling). Server will start if not running.");
 		options.add("path", "", "Path to dir or *.hxproj file. If path is dir, then first found *.hxproj file in that dir will be used.");
 		
@@ -38,6 +44,13 @@ class Commands
 			var project = FlashDevelopProject.load(options.get("path"));
 			if (project != null)
 			{
+				if (options.get("outputPath") != "") project.outputPath = options.get("outputPath");
+				if (options.get("outputType") != "") project.outputType = options.get("outputType");
+				if (options.get("platform") != "") project.platform = options.get("platform");
+				if (options.get("mainClass") != "") project.mainClass = options.get("mainClass");
+				if (options.get("noPreBuild")) project.preBuildCommand = "";
+				if (options.get("noPostBuild")) project.postBuildCommand = "";
+				
 				project.build(addParams, options.get("port"));
 			}
 			else
@@ -56,7 +69,7 @@ class Commands
 			Lib.println("");
 			Lib.println("Examples:");
 			Lib.println("");
-			Lib.println("    haxelib run hant fdbuild .");
+			Lib.println("    haxelib run hant fdbuild");
 			Lib.println("        Build project using *.fdproj file from the current directory.");
 			
 		}
