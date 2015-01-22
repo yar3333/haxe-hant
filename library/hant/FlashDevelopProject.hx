@@ -95,7 +95,7 @@ class FlashDevelopProject
 					else
 					if (elem.has.directives)
 					{
-						var s = elem.att.directives.htmlUnescape().trim();
+						var s = elem.att.directives.htmlUnescape().htmlUnescape().trim();
 						r.directives = s != "" ? ~/\s+/g.split(s) : [];
 					}
 					else
@@ -232,7 +232,7 @@ class FlashDevelopProject
 		{
 			runCommands("Running Pre-Build Command Line...", preBuildCommand, echo, verbose);
 			
-			var r = outputType == "Application"
+			var r = outputType.toLowerCase() == "application"
 				? HaxeCompiler.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose)
 				: 0;
 			
