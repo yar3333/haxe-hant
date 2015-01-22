@@ -140,9 +140,9 @@ class FlashDevelopProject
 		var i = allClassPaths.length - 1;
 		while (i >= 0)
 		{
-			if (FileSystem.exists(allClassPaths[i] + relativeFilePath))
+			if (FileSystem.exists(Path.join([ allClassPaths[i], relativeFilePath ])))
 			{
-				return allClassPaths[i] + relativeFilePath;
+				return Path.join([ allClassPaths[i], relativeFilePath ]);
 			}
 			i--;
 		}
