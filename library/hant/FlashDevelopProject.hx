@@ -232,7 +232,7 @@ class FlashDevelopProject
 			runCommands("Running Pre-Build Command Line...", preBuildCommand, echo, verbose);
 			
 			var r = outputType == "Application"
-				? Haxe.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose)
+				? HaxeCompiler.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose)
 				: 0;
 			
 			if (r == 0 || alwaysRunPostBuild)
@@ -247,6 +247,42 @@ class FlashDevelopProject
 		}
 		
 		if (saveCwd != null) Sys.setCwd(saveCwd);
+	}
+	
+	function runCommands(message:String, commandString:String, echo:Bool, verbose:Bool)
+	{
+		var commands = commandString.replace("\r\n", "\n").replace("\r", "\n").split("\n").map(std.StringTools.trim).filter(function(s) return s != "");
+		if (commands.length > 0)
+		{
+			if (verbose) Sys.println(message);
+			for (command in commands)
+			{
+				command = bindVars(command, verbose);
+				if (verbose) Sys.println("cmd: " + command);
+				Sys.command(command);
+			}
+		}
+	}
+	
+	function bindVars(text:String, verbose:Bool) : String
+	{
+		return ~/\$\(([a-zA-Z0-9_]+)\)/g.map(text, function(re)
+		{
+			return switch (re.matched(1))
+			{
+				case "ProjectName": Path.withoutDirectory(Path.withoutExtension(projectFilePath));
+				case "OutputDir": Path.directory(binPath);
+				case "OutputName": Path.withoutDirectory(binPath);
+				case "ProjectDir": Path.directory(projectFilePath);
+				case "ProjectPath": projectFilePath;
+				case "TargetPlatform": platform;
+				case "CompilerPath": Path.directory(HaxeCompiler.getPath());
+				case _:
+					if (verbose) Log.echo("WARNING: unknow variable $(" + re.matched(1) + ")");
+					re.matched(0);
+			}
+		});
+
 	}
 	
 	static function findProjectFile(dir:String) : String
@@ -270,19 +306,5 @@ class FlashDevelopProject
 		}
 		
 		return r.length == 1 ? r[0] : null;
-	}
-	
-	static function runCommands(message:String, commandString:String, echo:Bool, verbose:Bool)
-	{
-		var commands = commandString.replace("\r\n", "\n").replace("\r", "\n").split("\n").map(std.StringTools.trim).filter(function(s) return s != "");
-		if (commands.length > 0)
-		{
-			if (verbose) Sys.println(message);
-			for (command in commands)
-			{
-				if (verbose) Sys.println("cmd: " + command);
-				Sys.command(command);
-			}
-		}
 	}
 }
