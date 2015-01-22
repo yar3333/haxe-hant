@@ -15,7 +15,7 @@ class FlashDevelopProject
 	public var projectFilePath = "";
 	
 	public var outputType = "Application";
-	public var binPath = "";
+	public var outputPath = "";
 	public var classPaths : Array<String> = [];
 	public var libs : Array<String> = [];
 	public var isDebug = false;
@@ -52,7 +52,7 @@ class FlashDevelopProject
 			{
 				if (elem.name == "movie")
 				{
-					if (elem.has.bin) r.binPath = elem.att.bin;
+					if (elem.has.path) r.outputPath = elem.att.path;
 					else
 					if (elem.has.platform) r.platform = elem.att.platform.toLowerCase();
 					else
@@ -149,9 +149,10 @@ class FlashDevelopProject
 		return null;
 	}
 	
-	public function getBuildParams(?platform:String, ?destPath:String, ?addDefines:Array<String>, ?addLibs:Array<String>) : Array<String>
+	public function getBuildParams(?platform:String, ?outputPath:String, ?addDefines:Array<String>, ?addLibs:Array<String>) : Array<String>
 	{
 		if (platform == null) platform = this.platform;
+		if (outputPath == null) outputPath = this.outputPath;
 		if (addDefines == null) addDefines = [];
 		if (addLibs == null) addLibs = [];
 		
@@ -179,9 +180,9 @@ class FlashDevelopProject
         }
 		
 		params.push("-" + platform);
-		if (destPath != null && destPath != "")
+		if (outputPath != null)
 		{
-			params.push(destPath);
+			params.push(outputPath != "" ? outputPath : ".");
 		}
 		else
 		{
@@ -271,8 +272,8 @@ class FlashDevelopProject
 			return switch (re.matched(1))
 			{
 				case "ProjectName": Path.withoutDirectory(Path.withoutExtension(projectFilePath));
-				case "OutputDir": Path.directory(binPath);
-				case "OutputName": Path.withoutDirectory(binPath);
+				case "OutputDir": Path.directory(outputPath);
+				case "OutputName": Path.withoutDirectory(outputPath);
 				case "ProjectDir": Path.directory(projectFilePath);
 				case "ProjectPath": projectFilePath;
 				case "TargetPlatform": platform;
