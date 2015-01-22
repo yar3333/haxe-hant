@@ -1,10 +1,6 @@
 package hant;
 
-#if neko
-import neko.Lib;
-#elseif php
-import php.Lib;
-#end
+using StringTools;
 
 /**
  * Global log class.
@@ -87,9 +83,11 @@ class Log
         {
             if (shown.pop())
 			{
+				text = Std.string(text);
 				if (!inBlock) print(indent(ind));
 				ind--;
-				println("[" + text + "]");
+				if (text.indexOf("\n") < 0)	println("[" + text + "]");
+				else						println("\n" + indent(ind + 1) + "[\n" + indent(ind + 2) + text.replace("\n", "\n" + indent(ind + 2)) + "\n" + indent(ind + 1) + "]");
 				inBlock = false;
 			}
         }
@@ -100,25 +98,28 @@ class Log
     {
 		if (depth < depthLimit)
         {
-            if (shown.pop())
+			if (shown.pop())
 			{
+				text = Std.string(text);
 				if (!inBlock) print(indent(ind));
 				ind--;
-				println("[" + text + "]");
+				if (text.indexOf("\n") < 0)	println("[" + text + "]");
+				else						println("\n" + indent(ind + 1) + "[\n" + indent(ind + 2) + text.replace("\n", "\n" + indent(ind + 2)) + "\n" + indent(ind + 1) + "]");
 				inBlock = false;
 			}
         }
         depth--;
     }
 	
-	function echoInner(message:String, level=0)
+	function echoInner(text:String, level=0)
 	{
 		if (depth < depthLimit)
 		{
             if (level < levelLimit)
 			{
+				text = Std.string(text);
 				if (inBlock) println("");
-				println(indent(ind + 1) + message);
+				println(indent(ind) + text.replace("\n", "\n" + indent(ind)));
 				inBlock = false;
 			}
 		}
@@ -131,12 +132,12 @@ class Log
 	
 	function print(s:String)
 	{
-		Lib.print(s);
+		Sys.print(s);
 	}
 	
 	function println(s:String)
 	{
-		Lib.println(s);
+		Sys.println(s);
 	}
 	
 	//}
