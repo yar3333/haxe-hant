@@ -259,6 +259,7 @@ class FlashDevelopProject
 				case "ProjectName": Path.withoutDirectory(Path.withoutExtension(projectFilePath));
 				case "OutputDir": Path.directory(outputPath);
 				case "OutputName": Path.withoutDirectory(outputPath);
+				case "OutputFile": outputPath;
 				case "ProjectDir": Path.directory(projectFilePath);
 				case "ProjectPath": projectFilePath;
 				case "TargetPlatform": platform;
