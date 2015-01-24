@@ -27,8 +27,7 @@ class Haxelib
 				{
 					var path = lines[i - 1].trim();
 					if (path == "") path = ".";
-					var p = path.replace("\\", "/").rtrim("/") + "/";
-					r.set(lib, p);
+					r.set(lib, Path.normalize(path));
 					count++;
 				}
 			}
@@ -45,9 +44,9 @@ class Haxelib
 	public static function getStdLibPath()
 	{
 		var haxeStdPath = Sys.getEnv("HAXE_STD_PATH");
-		if (haxeStdPath != null && haxeStdPath != "") return haxeStdPath.rtrim("\\/");
+		if (haxeStdPath != null && haxeStdPath != "") return Path.normalize(haxeStdPath);
 		var haxePath = Sys.getEnv("HAXEPATH");
-		if (haxePath != null && haxePath != "") return haxe.io.Path.addTrailingSlash(haxePath) + "std";
-		return Sys.systemName() == "Windows" ? "C:\\HaxeToolkit\\haxe\\std" : "/usr/share/haxe/std";
+		if (haxePath != null && haxePath != "") return Path.normalize(Path.join([ haxePath, "std" ]));
+		return Sys.systemName() == "Windows" ? "C:/HaxeToolkit/haxe/std" : "/usr/share/haxe/std";
 	}
 }

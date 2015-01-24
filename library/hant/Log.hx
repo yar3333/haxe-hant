@@ -1,4 +1,5 @@
 package hant;
+import stdlib.Exception;
 
 using StringTools;
 
@@ -23,12 +24,12 @@ class Log
         if (instance != null) instance.startInner(message, level);
     }
     
-    public static function finishSuccess(?text:String)
+    public static function finishSuccess(text="OK")
     {
 		if (instance != null) instance.finishSuccessInner(text);
     }
     
-    public static function finishFail(?text:String)
+    public static function finishFail(text="FAIL")
     {
 		if (instance != null) instance.finishFailInner(text);
     }
@@ -36,6 +37,38 @@ class Log
 	public static function echo(message:String, level=0)
 	{
 		if (instance != null) instance.echoInner(message, level);
+	}
+	
+	public static function process(message:String, level=0, procFunc:Void->Void) : Void
+	{
+		start(message, level);
+		try
+		{
+			procFunc();
+		}
+		catch (e:Dynamic)
+		{
+			finishFail();
+			Exception.rethrow(e);
+		}
+		finishSuccess();
+	}
+	
+	public static function processResult<T>(message:String, level=0, procFunc:Void->T) : T
+	{
+		start(message, level);
+		var r : T = null;
+		try
+		{
+			r = procFunc();
+		}
+		catch (e:Dynamic)
+		{
+			finishFail();
+			Exception.rethrow(e);
+		}
+		finishSuccess();
+		return r;
 	}
 	
 	//{ instance fields ====================================================================================
@@ -57,7 +90,7 @@ class Log
 		shown = [];
     }
     
-    function startInner(message:String, level=0)
+    function startInner(message:String, level:Int)
     {
         depth++;
         if (depth < depthLimit)
@@ -77,7 +110,7 @@ class Log
         }
     }
     
-    function finishSuccessInner(text="OK")
+    function finishSuccessInner(text:String)
     {
         if (depth < depthLimit)
         {
@@ -94,7 +127,7 @@ class Log
         depth--;
     }
     
-    function finishFailInner(text="FAIL")
+    function finishFailInner(text:String)
     {
 		if (depth < depthLimit)
         {
@@ -111,7 +144,7 @@ class Log
         depth--;
     }
 	
-	function echoInner(text:String, level=0)
+	function echoInner(text:String, level:Int)
 	{
 		if (depth < depthLimit)
 		{
