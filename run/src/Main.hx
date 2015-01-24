@@ -1,7 +1,5 @@
-import hant.FileSystemTools;
 import hant.Log;
-import hant.PathTools;
-import neko.Lib;
+import hant.Path;
 
 class Main 
 {
@@ -9,7 +7,7 @@ class Main
 	{
         var args = Sys.args();
 		
-		var exeDir = PathTools.normalize(Sys.getCwd());
+		var exeDir = Path.normalize(Sys.getCwd());
 		if (args.length > 0)
 		{
 			var dir = args.pop();
@@ -41,7 +39,7 @@ class Main
 			switch (k)
 			{
 				case "fdbuild":
-					commands.fdbuild(args);
+					Sys.exit(commands.fdbuild(args));
 					
 				default:
 					fail("Unknow command.");
@@ -49,26 +47,21 @@ class Main
 		}
 		else
 		{
-			summaryHelp();
+			Sys.println("Hant is a tool to support haxe projects.");
+			Sys.println("Usage: haxelib run hant [-v] <command> <args>");
+			Sys.println("where '-v' is the verbose key and <command> may be:");
+			Sys.println("");
+			Sys.println("    fdbuild         Build using FlashDevelop project (*.hxproj).");
+			Sys.println("");
+			Sys.println("Type 'haxelib run hant <command> --help' to get help about specified command.");
 		}
 		
-		Sys.exit(0);
+		Sys.exit(1);
 	}
 	
 	static function fail(message:String)
 	{
-		Lib.println("ERROR: " + message);
+		Sys.println("ERROR: " + message);
 		Sys.exit(1);
-	}
-	
-	static function summaryHelp()
-	{
-		Lib.println("Hant is a tool to support haxe projects.");
-		Lib.println("Usage: haxelib run hant [-v] <command> <args>");
-		Lib.println("where '-v' is the verbose key and <command> may be:");
-		Lib.println("");
-		Lib.println("    fdbuild         Build using FlashDevelop project (*.hxproj).");
-		Lib.println("");
-		Lib.println("Type 'haxelib run hant <command> --help' to get help about specified command.");
 	}
 }

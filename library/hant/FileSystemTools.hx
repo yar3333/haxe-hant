@@ -1,6 +1,5 @@
 package hant;
 
-import haxe.io.Path;
 import stdlib.Exception;
 import sys.FileSystem;
 import sys.io.File;
@@ -53,7 +52,7 @@ class FileSystemTools
     
     public static function createDirectory(path:String, verbose=true)
     {
-		path = PathTools.normalize(path);
+		path = Path.normalize(path);
 		
         if (path != "" && !FileSystem.exists(path))
 		{
@@ -73,8 +72,8 @@ class FileSystemTools
     
     public static function copyFolderContent(src:String, dest:String, verbose=true)
     {
-		src = PathTools.normalize(src);
-        dest = PathTools.normalize(dest);
+		src = Path.normalize(src);
+        dest = Path.normalize(dest);
 		
 		if (verbose) Log.start("Copy directory '" + src + "' => '" + dest + "'");
         
@@ -253,7 +252,7 @@ class FileSystemTools
 				copy_file_preserving_attributes = NdllTools.load("hant", "copy_file_preserving_attributes", 2);
 			}
 			
-			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(PathTools.makeNative(src)), neko.Lib.haxeToNeko(PathTools.makeNative(dest))));
+			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(Path.makeNative(src)), neko.Lib.haxeToNeko(Path.makeNative(dest))));
 			switch (r)
 			{
 				case 0: // nothing to do

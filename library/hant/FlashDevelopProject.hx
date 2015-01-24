@@ -1,6 +1,5 @@
 package hant;
 
-import haxe.io.Path;
 import haxe.xml.Fast;
 import stdlib.Exception;
 import stdlib.Std;
@@ -67,7 +66,7 @@ class FlashDevelopProject
 			{
 				if (elem.name == 'class' && elem.has.path)
 				{
-					var path = PathTools.normalize(elem.att.path.trim());
+					var path = Path.normalize(elem.att.path.trim());
 					if (path == "") path = ".";
 					r.classPaths.push(path);
 				}
@@ -213,44 +212,28 @@ class FlashDevelopProject
 		return params;
 	}
 	
-	public function build(?addParams:Array<String>, port=0, echo=true, verbose=true)
+	public function build(?addParams:Array<String>, port=0, verbose=true) : Int
 	{
-		if (addParams == null) addParams = [];
-		
-		var saveCwd : String = null;
-		if (projectFilePath != null && projectFilePath != "")
+		return runInDir(projectFilePath != null ? Path.directory(projectFilePath):null, function()
 		{
-			var dir = Path.directory(projectFilePath);
-			if (dir != "")
-			{
-				saveCwd = Sys.getCwd();
-				Sys.setCwd(dir);
-			}
-		}
-		
-		try
-		{
-			runCommands("Running Pre-Build Command Line...", preBuildCommand, echo, verbose);
+			var r1 = runCommands("Running Pre-Build Command Line...", preBuildCommand, verbose);
+			if (r1 != 0) return r1;
 			
-			var r = outputType.toLowerCase() == "application"
-				? HaxeCompiler.run(getBuildParams().concat(addParams), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", echo, verbose)
+			var r2 = outputType.toLowerCase() == "application"
+				? HaxeCompiler.run(getBuildParams().concat(addParams != null ? addParams : []), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", true, verbose)
 				: 0;
 			
-			if (r == 0 || alwaysRunPostBuild)
+			if (r2 == 0 || alwaysRunPostBuild)
 			{
-				runCommands("Running Post-Build Command Line...", postBuildCommand, echo, verbose);
+				var r3 = runCommands("Running Post-Build Command Line...", postBuildCommand, verbose);
+				if (r3 != 0) return r3;
 			}
-		}
-		catch (e:Dynamic)
-		{
-			if (saveCwd != null) Sys.setCwd(saveCwd);
-			Exception.rethrow(e);
-		}
-		
-		if (saveCwd != null) Sys.setCwd(saveCwd);
+			
+			return r2;
+		});
 	}
 	
-	function runCommands(message:String, commandString:String, echo:Bool, verbose:Bool)
+	function runCommands(message:String, commandString:String, verbose:Bool) : Int
 	{
 		var commands = commandString.replace("\r\n", "\n").replace("\r", "\n").split("\n").map(std.StringTools.trim).filter(function(s) return s != "");
 		if (commands.length > 0)
@@ -260,9 +243,11 @@ class FlashDevelopProject
 			{
 				command = bindVars(command, verbose);
 				if (verbose) Sys.println("cmd: " + command);
-				Sys.command(command);
+				var r = Sys.command(command);
+				if (r != 0) return r;
 			}
 		}
+		return 0;
 	}
 	
 	function bindVars(text:String, verbose:Bool) : String
@@ -307,5 +292,31 @@ class FlashDevelopProject
 		}
 		
 		return r.length == 1 ? r[0] : null;
+	}
+	
+	static function runInDir(dir:String, func:Void->Int) : Int
+	{
+		var saveCwd : String = null;
+		if (dir != null && dir != "")
+		{
+			saveCwd = Sys.getCwd();
+			Sys.setCwd(dir);
+		}
+		
+		var r : Int = null;
+		
+		try
+		{
+			r = func();
+		}
+		catch (e:Dynamic)
+		{
+			if (saveCwd != null) Sys.setCwd(saveCwd);
+			Exception.rethrow(e);
+		}
+		
+		Sys.setCwd(saveCwd);
+		
+		return r;
 	}
 }

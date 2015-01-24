@@ -15,7 +15,7 @@ class Commands
 		this.verbose = verbose;
 	}
 	
-	public function fdbuild(args:Array<String>)
+	public function fdbuild(args:Array<String>) : Int
 	{
 		var options = new CmdOptions();
 		
@@ -51,12 +51,11 @@ class Commands
 				if (options.get("noPreBuild")) project.preBuildCommand = "";
 				if (options.get("noPostBuild")) project.postBuildCommand = "";
 				
-				project.build(addParams, options.get("port"));
+				return project.build(addParams, options.get("port"));
 			}
 			else
 			{
 				Lib.println("ERROR: FlashDevelop haxe project not found by path '" + options.get("path") + "'.");
-				Sys.exit(1);
 			}
 		}
 		else
@@ -71,7 +70,8 @@ class Commands
 			Lib.println("");
 			Lib.println("    haxelib run hant fdbuild");
 			Lib.println("        Build project using *.fdproj file from the current directory.");
-			
 		}
+		
+		return 1;
 	}
 }
