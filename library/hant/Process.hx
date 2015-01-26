@@ -207,11 +207,11 @@ class Process
 					for (i in 0...s.length)
 					{
 						var c = s.charAt(i);
-						if (verbose && c == "\n")
+						if (echo && c == "\n")
 						{
 							var bufStr = buffer.toString();
 							var n = bufStr.lastIndexOf("\n");
-							if (echo) Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
 						}
 						buffer.add(c);
 					}
@@ -233,11 +233,11 @@ class Process
 					for (i in 0...s.length)
 					{
 						var c = s.charAt(i);
-						if (verbose && c == "\n")
+						if (echo && c == "\n")
 						{
 							var bufStr = buffer.toString();
 							var n = bufStr.lastIndexOf("\n");
-							if (echo) Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
+							Lib.println(n < 0 ? bufStr : bufStr.substr(n + 1));
 						}
 						buffer.add(c);
 					}
