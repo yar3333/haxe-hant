@@ -221,8 +221,10 @@ class FlashDevelopProject
 			var r1 = runCommands("Running Pre-Build Command Line...", preBuildCommand, verbose);
 			if (r1 != 0) return r1;
 			
+			var projectDir = projectFilePath != null ? Path.directory(projectFilePath) : "";
+			
 			var r2 = outputType.toLowerCase() == "application"
-				? HaxeCompiler.run(getBuildParams().concat(addParams != null ? addParams : []), port, projectFilePath != null && projectFilePath != "" ? FileSystem.fullPath(Path.directory(projectFilePath)) : ".", true, verbose)
+				? HaxeCompiler.run(getBuildParams().concat(addParams != null ? addParams : []), port, projectDir != "" ? FileSystem.fullPath(projectDir) : ".", true, verbose)
 				: 0;
 			
 			if (r2 == 0 || alwaysRunPostBuild)
