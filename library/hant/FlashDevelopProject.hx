@@ -7,6 +7,8 @@ import sys.FileSystem;
 import sys.io.File;
 using stdlib.StringTools;
 
+class AmbiguousProjectFilesException extends Exception {}
+
 class FlashDevelopProject 
 {
 	static var libsPathCache = new Map<String,String>();
@@ -289,7 +291,7 @@ class FlashDevelopProject
 		
 		if (r.length > 1)
 		{
-			throw new Exception("Several FlashDevelop project files in the '" + dir + "' directory found, so you must specify full path to file.");
+			throw new AmbiguousProjectFilesException("Several FlashDevelop project files in the '" + dir + "' directory found, so you must specify a path to file.");
 		}
 		
 		return r.length == 1 ? r[0] : null;
@@ -298,7 +300,7 @@ class FlashDevelopProject
 	static function runInDir(dir:String, func:Void->Int) : Int
 	{
 		var saveCwd : String = null;
-		if (dir != null && dir != "")
+		if (dir != null && dir != "" && dir != ".")
 		{
 			saveCwd = Sys.getCwd();
 			Sys.setCwd(dir);
@@ -316,7 +318,7 @@ class FlashDevelopProject
 			Exception.rethrow(e);
 		}
 		
-		Sys.setCwd(saveCwd);
+		if (saveCwd != null) Sys.setCwd(saveCwd);
 		
 		return r;
 	}
