@@ -41,21 +41,28 @@ class Commands
 			
 			options.parse(args);
 			
-			var project = FlashDevelopProject.load(options.get("path"));
-			if (project != null)
+			try
 			{
-				if (options.get("outputPath") != "") project.outputPath = options.get("outputPath");
-				if (options.get("outputType") != "") project.outputType = options.get("outputType");
-				if (options.get("platform") != "") project.platform = options.get("platform");
-				if (options.get("mainClass") != "") project.mainClass = options.get("mainClass");
-				if (options.get("noPreBuild")) project.preBuildCommand = "";
-				if (options.get("noPostBuild")) project.postBuildCommand = "";
-				
-				return project.build(addParams, options.get("port"));
+				var project = FlashDevelopProject.load(options.get("path"));
+				if (project != null)
+				{
+					if (options.get("outputPath") != "") project.outputPath = options.get("outputPath");
+					if (options.get("outputType") != "") project.outputType = options.get("outputType");
+					if (options.get("platform") != "") project.platform = options.get("platform");
+					if (options.get("mainClass") != "") project.mainClass = options.get("mainClass");
+					if (options.get("noPreBuild")) project.preBuildCommand = "";
+					if (options.get("noPostBuild")) project.postBuildCommand = "";
+					
+					return project.build(addParams, options.get("port"));
+				}
+				else
+				{
+					Lib.println("ERROR: FlashDevelop haxe project not found by path '" + options.get("path") + "'.");
+				}
 			}
-			else
+			catch (e:AmbiguousProjectFilesException)
 			{
-				Lib.println("ERROR: FlashDevelop haxe project not found by path '" + options.get("path") + "'.");
+				Lib.println("ERROR: " + e.message);
 			}
 		}
 		else
