@@ -40,9 +40,6 @@ class Main
 			{
 				case "fdbuild":
 					Sys.exit(commands.fdbuild(args));
-				
-				case "ftp":
-					Sys.exit(commands.ftp(args));
 					
 				default:
 					fail("Unknow command.");
@@ -55,7 +52,6 @@ class Main
 			Sys.println("where '-v' is the verbose key and <command> may be:");
 			Sys.println("");
 			Sys.println("    fdbuild         Build using FlashDevelop project (*.hxproj).");
-			Sys.println("    ftp             Upload/download files to/from FTP server.");
 			Sys.println("");
 			Sys.println("Type 'haxelib run hant <command> --help' to get help about specified command.");
 		}
