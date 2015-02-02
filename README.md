@@ -119,7 +119,7 @@ var func = NdllTools.load("myModule", "prim", argCount);
 ```
 NdllTool.load() test next paths:
 
- * %FOLDER_OF_CURRENT_MODULE%/myModule-windows.ndll
- * %FOLDER_OF_CURRENT_MODULE%/ndll/Windows/myModule.ndll
- * %NEKOPATH%/myModule.ndll
- * %HAXELIBS%/myModule/%VERSION%/ndll/Windows/myModule.ndll (useful if installed same-named haxe library)
+ * **FOLDER_OF_CURRENT_MODULE** / myModule-windows.ndll
+ * **FOLDER_OF_CURRENT_MODULE** / ndll / Windows / myModule.ndll
+ * **NEKOPATH** / myModule.ndll
+ * **HAXELIBS** / myModule / **VERSION** / ndll/Windows / myModule.ndll (useful if installed same-named haxe library)
