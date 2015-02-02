@@ -118,6 +118,7 @@ For example, if you want to load function from module "myModule" on Windows plat
 var func = NdllTools.load("myModule", "prim", argCount);
 ```
 NdllTool.load() test next paths:
+
  * %FOLDER_OF_CURRENT_MODULE%/myModule-windows.ndll
  * %FOLDER_OF_CURRENT_MODULE%/ndll/Windows/myModule.ndll
  * %NEKOPATH%/myModule.ndll
