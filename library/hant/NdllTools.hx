@@ -76,10 +76,10 @@ class NdllTools
 		{
 			try
 			{
-				var haxelibPaths = Haxelib.getPaths([ lib ]);
-				if (haxelibPaths.get(lib) != null)
+				var path = Haxelib.getPath(lib);
+				if (path != null)
 				{
-					var s = haxelibPaths.get(lib) + "ndll/" + systemName + "/" + lib;
+					var s = path + "/ndll/" + systemName + "/" + lib;
 					if (FileSystem.exists(s + ".ndll"))
 					{
 						paths.set(lib, s);

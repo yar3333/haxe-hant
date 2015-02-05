@@ -41,6 +41,9 @@ class Main
 				case "fdbuild":
 					Sys.exit(commands.fdbuild(args));
 					
+				case "path":
+					Sys.exit(commands.path(args));
+					
 				default:
 					fail("Unknow command.");
 			}
@@ -52,6 +55,7 @@ class Main
 			Sys.println("where '-v' is the verbose key and <command> may be:");
 			Sys.println("");
 			Sys.println("    fdbuild         Build using FlashDevelop project (*.hxproj).");
+			Sys.println("    path            Get class paths of the specified haxe libraries.");
 			Sys.println("");
 			Sys.println("Type 'haxelib run hant <command> --help' to get help about specified command.");
 		}

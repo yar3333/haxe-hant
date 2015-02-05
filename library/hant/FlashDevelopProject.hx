@@ -11,8 +11,6 @@ class AmbiguousProjectFilesException extends Exception {}
 
 class FlashDevelopProject 
 {
-	static var libsPathCache = new Map<String,String>();
-	
 	public var projectFilePath = "";
 	
 	public var outputType = "Application";
@@ -29,7 +27,7 @@ class FlashDevelopProject
 	public var alwaysRunPostBuild = false;
 	
 	public var allClassPaths(get, never) : Array<String>;
-	function get_allClassPaths() return [ Haxelib.getStdLibPath() ].concat(Lambda.array(getLibPaths()).concat(classPaths));
+	function get_allClassPaths() return [ Haxelib.getStdPath() ].concat(Lambda.array(getLibPaths()).concat(classPaths));
 	
 	public function new() { }
 	
@@ -130,9 +128,8 @@ class FlashDevelopProject
 	
 	public function getLibPaths() : Map<String, String>
 	{
-		Haxelib.getPaths(libs, libsPathCache);
 		var r = new Map<String, String>();
-		for (lib in libs) r.set(lib, libsPathCache.get(lib));
+		for (lib in libs) r.set(lib, Haxelib.getPath(lib));
 		return r;
 	}
 	
