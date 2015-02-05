@@ -1,6 +1,6 @@
 import hant.CmdOptions;
 import hant.FlashDevelopProject;
-import neko.Lib;
+import hant.Haxelib;
 using StringTools;
 using Lambda;
 
@@ -57,26 +57,54 @@ class Commands
 				}
 				else
 				{
-					Lib.println("ERROR: FlashDevelop haxe project not found by path '" + options.get("path") + "'.");
+					Sys.println("ERROR: FlashDevelop haxe project not found by path '" + options.get("path") + "'.");
 				}
 			}
 			catch (e:AmbiguousProjectFilesException)
 			{
-				Lib.println("ERROR: " + e.message);
+				Sys.println("ERROR: " + e.message);
 			}
 		}
 		else
 		{
-			Lib.println("Build using FlashDevelop project (*.hxproj).");
-			Lib.println("Usage: haxelib run hant [-v] fdbuild [ --port <PORT> ] [<path>] [ -- <additional_haxe_compiler_options>]");
-			Lib.println("where '-v' is the verbose key. Command args description:");
-			Lib.println("");
-			Lib.print(options.getHelpMessage());
-			Lib.println("");
-			Lib.println("Examples:");
-			Lib.println("");
-			Lib.println("    haxelib run hant fdbuild");
-			Lib.println("        Build project using *.fdproj file from the current directory.");
+			Sys.println("Build using FlashDevelop project (*.hxproj).");
+			Sys.println("Usage: haxelib run hant [-v] fdbuild [ --port <PORT> ] [<path>] [ -- <additional_haxe_compiler_options>]");
+			Sys.println("where '-v' is the verbose key. Command args description:");
+			Sys.println("");
+			Sys.print(options.getHelpMessage());
+			Sys.println("");
+			Sys.println("Examples:");
+			Sys.println("");
+			Sys.println("    haxelib run hant fdbuild");
+			Sys.println("        Build project using *.fdproj file from the current directory.");
+		}
+		
+		return 1;
+	}
+	
+	public function path(args:Array<String>) : Int
+	{
+		var options = new CmdOptions();
+		
+		options.addRepeatable("libs", String, "Library name. You may specify several libraries.");
+		
+		if (args.length > 0 && args[0] != "--help")
+		{
+			options.parse(args);
+			var libs : Array<String> = options.get("libs");
+			for (lib in libs)
+			{
+				var path = Haxelib.getPath(lib);
+				if (path == null) return 1;
+				Sys.println(path);
+			}
+			return 0;
+		}
+		else
+		{
+			Sys.println("Get class paths of the specified haxe libraries.");
+			Sys.println("Use 'std' as library name to get path to standard library.");
+			Sys.println("Usage: haxelib run hant path <library1> [ ... <libraryN>]");
 		}
 		
 		return 1;

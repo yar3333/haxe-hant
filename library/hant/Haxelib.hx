@@ -1,47 +1,72 @@
 package hant;
 
-import stdlib.Exception;
+import haxe.Json;
+import sys.FileSystem;
+import sys.io.File;
 using stdlib.StringTools;
 
 class Haxelib
 {
-	public static function getPaths(libs:Array<String>, ?r:Map<String, String>) : Map<String,String>
+	static var repo : String;
+	static var pathCache = new Map<String, String>();
+	
+	public static function getPath(lib:String) : String
 	{
-		if (r == null) r = new Map<String,String>();
-
-		libs = libs.filter(function(lib) return !r.exists(lib));
+		if (lib == "std") return getStdPath();
 		
-		if (libs.length == 0) return r;
-
-		var output = Process.run("haxelib", [ "path" ].concat(libs), null, false, false).output;
-		var lines = output.split("\n");
+		if (pathCache.exists(lib)) return pathCache.get(lib);
 		
-		var count = 0;
-		
-		for (i in 0...lines.length)
+		if (repo == null)
 		{
-			if (lines[i].startsWith("-D "))
+			repo = Path.removeTrailingSlashes(Process.run("haxelib", [ "config" ], false, false).output.trim());
+		}
+		
+		var ver : String = null;
+		if (lib.indexOf(":") >= 0)
+		{
+			ver = lib.split(":")[1];
+			lib = lib.split(":")[0];
+		}
+		
+		var base = repo + "/" + lib;
+		
+		if (!FileSystem.exists(base)) return null;
+		
+		var path : String = null;
+		
+		if (ver == null)
+		{
+			if (FileSystem.exists(base + "/.dev"))
 			{
-				var lib = lines[i].substr("-D ".length);
-				if (Lambda.has(libs, lib))
-				{
-					var path = lines[i - 1].trim();
-					if (path == "") path = ".";
-					r.set(lib, Path.normalize(path));
-					count++;
-				}
+				path = File.getContent(base + "/.dev").trim();
+			}
+			else
+			{
+				if (!FileSystem.exists(base + "/.current")) return null;
+				path = repo + "/" + lib + "/" + File.getContent(base + "/.current").trim().replace(".", ",");
 			}
 		}
-		
-		if (count != libs.length)
+		else
 		{
-			throw new Exception("haxelib error: haxelib path " + libs.join(" ") + "\n" + output);
+			path = repo + "/" + lib + "/" + ver.trim().replace(".", ",");
 		}
 		
-		return r;
+		if (!FileSystem.exists(path)) return null;
+		
+		if (FileSystem.exists(path + "/haxelib.json"))
+		{
+			var info = Json.parse(File.getContent(path + "/haxelib.json"));
+			if (info.classPath != null) path = Path.join([ path, info.classPath ]);
+		}
+		
+		path = Path.normalize(path);
+		
+		pathCache.set(lib, path);
+		
+		return path;
 	}
 	
-	public static function getStdLibPath()
+	public static function getStdPath()
 	{
 		var haxeStdPath = Sys.getEnv("HAXE_STD_PATH");
 		if (haxeStdPath != null && haxeStdPath != "") return Path.normalize(haxeStdPath);
