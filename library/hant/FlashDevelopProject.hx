@@ -177,15 +177,18 @@ class FlashDevelopProject
 			params.push("-cp"); params.push(path.rtrim("/"));
         }
 		
-		params.push("-" + platform);
-		if (outputPath != null)
+		if (platform != "custom")
 		{
-			params.push(outputPath != "" ? outputPath : ".");
-		}
-		else
-		{
-			params.push("null");
-			params.push("--no-output");
+			params.push("-" + platform);
+			if (outputPath != null)
+			{
+				params.push(outputPath != "" ? outputPath : ".");
+			}
+			else
+			{
+				params.push("null");
+				params.push("--no-output");
+			}
 		}
 		
 		if (mainClass != null && mainClass != "")
