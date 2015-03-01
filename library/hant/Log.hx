@@ -17,7 +17,7 @@ using StringTools;
  */
 class Log
 {
-	public static var instance : Log;
+	public static var instance = new Log();
 	
     public static function start(message:String, level=0)
     {
@@ -73,8 +73,8 @@ class Log
 	
 	//{ instance fields ====================================================================================
 	
-    var depthLimit : Int;
-    var levelLimit : Int;
+    public var depthLimit : Int;
+    public var levelLimit : Int;
     var depth : Int;
 	var ind : Int;
     var inBlock : Bool;
