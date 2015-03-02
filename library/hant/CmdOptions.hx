@@ -140,47 +140,46 @@ class CmdOptions
 	{
 		var arg = args.shift();
 		
-		if (arg.substr(0, 1) == "-" && arg != "-" && arg != "--")
+		if (arg != "--")
 		{
-			arg = ~/^(--?.+)=(.+)$/.map(arg, function(r)
+			if (arg.substr(0, 1) == "-" && arg != "-")
 			{
-				args.unshift(r.matched(2));
-				return r.matched(1);
-			});
-			
-			for (opt in options)
-			{
-				if (opt.switches != null)
+				arg = ~/^(--?.+)=(.+)$/.map(arg, function(r)
 				{
-					for (s in opt.switches)
+					args.unshift(r.matched(2));
+					return r.matched(1);
+				});
+				
+				for (opt in options)
+				{
+					if (opt.switches != null)
 					{
-						if (s == arg)
+						for (s in opt.switches)
 						{
-							resolveSwitch(opt, arg);
-							return;
+							if (s == arg)
+							{
+								parseValue(opt, arg);
+								return;
+							}
 						}
 					}
 				}
-			}
-			
-			throw "Unknow switch '" + arg + "'.";
-		}
-		else
-		{
-			var opt = getNextNoSwitchOption();
-			if (opt != null)
-			{
-				args.unshift(arg);
-				resolveSwitch(opt, arg);
+				
+				throw "Unknow switch '" + arg + "'.";
 			}
 			else
 			{
-				throw "Unexpected argument '" + arg + "'.";
+				args.unshift(arg);
+				parseValue(getNextNoSwitchOption(), args[0]);
 			}
 		}
+		else
+		{
+			while (args.length > 0) parseValue(getNextNoSwitchOption(), args[0]);
+		}
 	}
-
-	function resolveSwitch(opt:Option, s:String) : Void
+	
+	function parseValue(opt:Option, s:String) : Void
 	{
 		switch (opt.type)
 		{
@@ -237,6 +236,8 @@ class CmdOptions
 				return options[i];
 			}
 		}
+		
+		throw "Unexpected argument '" + args[0] + "'.";
 		return null;
 	}
 }
