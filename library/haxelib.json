@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko","sys","flashdevelop","log","logging"],
   "description": "Library with ant-like methods. Helpful classes for building console application",
   "contributors": ["yar3333"],
-  "releasenote": "Enable Log by default.",
-  "version": "3.3.0",
+  "releasenote": "CmdOptions: treat \"--\" as delimiter for switches and values.",
+  "version": "3.3.1",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
