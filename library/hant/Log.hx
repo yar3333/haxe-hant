@@ -19,7 +19,7 @@ class Log
 {
 	public static var instance = new Log();
 	
-    public static function start(message:String, level=0)
+    public static function start(message:String, level=1)
     {
         if (instance != null) instance.startInner(message, level);
     }
@@ -34,12 +34,12 @@ class Log
 		if (instance != null) instance.finishFailInner(text);
     }
 	
-	public static function echo(message:String, level=0)
+	public static function echo(message:String, level=1)
 	{
 		if (instance != null) instance.echoInner(message, level);
 	}
 	
-	public static function process(message:String, level=0, procFunc:Void->Void) : Void
+	public static function process(message:String, level=1, procFunc:Void->Void) : Void
 	{
 		start(message, level);
 		try
@@ -54,7 +54,7 @@ class Log
 		finishSuccess();
 	}
 	
-	public static function processResult<T>(message:String, level=0, procFunc:Void->T) : T
+	public static function processResult<T>(message:String, level=1, procFunc:Void->T) : T
 	{
 		start(message, level);
 		var r : T = null;
@@ -95,7 +95,7 @@ class Log
         depth++;
         if (depth < depthLimit)
         {
-            if (level < levelLimit)
+            if (level <= levelLimit)
 			{
 				if (inBlock) println("");
 				print(indent(ind) + message + ": ");
@@ -148,7 +148,7 @@ class Log
 	{
 		if (depth < depthLimit)
 		{
-            if (level < levelLimit)
+            if (level <= levelLimit)
 			{
 				text = Std.string(text);
 				if (inBlock) println("");
