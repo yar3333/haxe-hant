@@ -156,6 +156,8 @@ class FlashDevelopProject
 		
 		platform = platform.toLowerCase();
 		if (platform == "javascript") platform = "js";
+		else
+		if (platform == "c++") platform = "cpp";
 		
         var params = new Array<String>();
         
