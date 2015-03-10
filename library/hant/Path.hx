@@ -66,7 +66,7 @@ class Path extends haxe.io.Path
     }
 	
 	#if sys
-	static var isWindows : Bool;
+	static var isWindows : Null<Bool>;
 	public static function makeNative(path:String) : String
 	{
 		if (isWindows == null) isWindows = Sys.systemName() == "Windows";
