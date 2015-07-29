@@ -78,7 +78,7 @@ class CmdOptions
 		var maxSwitchLength = 0;
 		for (opt in options)
 		{
-			if (opt.switches != null)
+			if (opt.switches != null && opt.switches.length > 0)
 			{
 				maxSwitchLength = Std.max(maxSwitchLength, opt.switches.join(", ").length);
 			}
