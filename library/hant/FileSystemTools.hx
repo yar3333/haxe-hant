@@ -135,11 +135,11 @@ class FileSystemTools
 				{
 					if (FileSystem.isDirectory(path + "/" + file))
 					{
-						deleteDirectory(path + "/" + file);
+						deleteDirectory(path + "/" + file, verbose);
 					}
 					else
 					{
-						deleteFile(path + "/" + file);
+						deleteFile(path + "/" + file, verbose);
 					}
 				}
 
