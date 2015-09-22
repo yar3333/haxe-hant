@@ -1,8 +1,13 @@
 package hant;
 
 import stdlib.Exception;
+#if unicode
+import unicode.FileSystem;
+import unicode.File;
+#else
 import sys.FileSystem;
 import sys.io.File;
+#end
 import sys.io.Process;
 using StringTools;
 
