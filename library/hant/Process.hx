@@ -40,8 +40,8 @@ private class Stdin extends haxe.io.Output
 		}
 	}
 
-	static var _stdin_write = NdllTools.loadLazy("hant","process_stdin_write", 4);
-	static var _stdin_close = NdllTools.loadLazy("hant","process_stdin_close", 1);
+	static var _stdin_write = Lib.loadLazy("hant","process_stdin_write", 4);
+	static var _stdin_close = Lib.loadLazy("hant","process_stdin_close", 1);
 }
 
 private class Stdout extends haxe.io.Input
@@ -75,8 +75,8 @@ private class Stdout extends haxe.io.Input
 		}
 	}
 
-	static var _stdout_read = NdllTools.loadLazy("hant","process_stdout_read", 4);
-	static var _stderr_read = NdllTools.loadLazy("hant","process_stderr_read", 4);
+	static var _stdout_read = Lib.loadLazy("hant","process_stdout_read", 4);
+	static var _stderr_read = Lib.loadLazy("hant","process_stderr_read", 4);
 }
 
 /**
@@ -269,10 +269,10 @@ class Process
 		return Lib.nekoToHaxe(_run_detached(Lib.haxeToNeko(fileName), Lib.haxeToNeko(args)));
 	}
 	
-	static var _run = NdllTools.loadLazy("hant","process_run", 4);
-	static var _exit = NdllTools.loadLazy("hant","process_exit", 1);
-	static var _pid = NdllTools.loadLazy("hant","process_pid", 1);
-	static var _close = NdllTools.loadLazy("hant","process_close", 1);
-	static var _kill = NdllTools.loadLazy("hant","process_kill", 1);
-	static var _run_detached = NdllTools.loadLazy("hant", "process_run_detached", 2);
+	static var _run = Lib.loadLazy("hant","process_run", 4);
+	static var _exit = Lib.loadLazy("hant","process_exit", 1);
+	static var _pid = Lib.loadLazy("hant","process_pid", 1);
+	static var _close = Lib.loadLazy("hant","process_close", 1);
+	static var _kill = Lib.loadLazy("hant","process_kill", 1);
+	static var _run_detached = Lib.loadLazy("hant", "process_run_detached", 2);
 }

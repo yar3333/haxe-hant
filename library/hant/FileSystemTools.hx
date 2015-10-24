@@ -250,11 +250,11 @@ class FileSystemTools
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	static function nativeCopyFile(src:String, dest:String)
 	{
-		if (Sys.systemName() == "Windows" && NdllTools.getPath("hant") != null)
+		if (Sys.systemName() == "Windows" && neko.Lib.getPath("hant") != null)
 		{
 			if (copy_file_preserving_attributes == null)
 			{
-				copy_file_preserving_attributes = NdllTools.load("hant", "copy_file_preserving_attributes", 2);
+				copy_file_preserving_attributes = neko.Lib.load("hant", "copy_file_preserving_attributes", 2);
 			}
 			
 			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(Path.makeNative(src)), neko.Lib.haxeToNeko(Path.makeNative(dest))));
