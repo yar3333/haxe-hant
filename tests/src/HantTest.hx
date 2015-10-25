@@ -1,8 +1,5 @@
-package;
-
 import hant.FileSystemTools;
 import hant.CmdOptions;
-import hant.NdllTools;
 
 class HantTest extends haxe.unit.TestCase
 {
@@ -17,21 +14,5 @@ class HantTest extends haxe.unit.TestCase
 		assertEquals(10, parser.get("count"));
 		assertEquals(true, parser.get("isRecursive"));
 		assertEquals("testpath", parser.get("path"));
-	}
-	
-	public function testNdllHant()
-	{
-		var lib = "hant";
-		var path = NdllTools.getPath(lib);
-		print("\n\tPath to ndll '" + lib + "' is '" + path + "'\n");
-		assertTrue(path != null);
-	}
-	
-	public function testNdllCurl()
-	{
-		var lib = "curl";
-		var path = NdllTools.getPath(lib);
-		print("\n\tPath to ndll '" + lib + "' is '" + path + "'\n");
-		assertTrue(path != null);
 	}
 }

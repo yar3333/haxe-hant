@@ -250,23 +250,31 @@ class FileSystemTools
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	static function nativeCopyFile(src:String, dest:String)
 	{
-		if (Sys.systemName() == "Windows" && neko.Lib.getPath("hant") != null)
+		if (Sys.systemName() == "Windows")
 		{
 			if (copy_file_preserving_attributes == null)
 			{
-				copy_file_preserving_attributes = neko.Lib.load("hant", "copy_file_preserving_attributes", 2);
+				try copy_file_preserving_attributes = neko.Lib.load("hant", "copy_file_preserving_attributes", 2)
+				catch (_:Dynamic) {}
 			}
 			
-			var r : Int = neko.Lib.nekoToHaxe(copy_file_preserving_attributes(neko.Lib.haxeToNeko(Path.makeNative(src)), neko.Lib.haxeToNeko(Path.makeNative(dest))));
-			switch (r)
+			if (copy_file_preserving_attributes != null)
 			{
-				case 0: // nothing to do
-				case 1: throw "Error open source file ('" + src + "').";
-				case 2: throw "Error open dest file ('" + dest + "').";
-				case 3: throw "Error get attributes from source file ('" + src + "').";
-				case 4: throw "Error set attributes to dest file ('" + dest + "').";
-				case _: throw "Error code is " + r + ".";
-				
+				var r = copy_file_preserving_attributes(neko.Lib.haxeToNeko(Path.makeNative(src)), neko.Lib.haxeToNeko(Path.makeNative(dest)));
+				switch (r)
+				{
+					case 0: // nothing to do
+					case 1: throw "Error open source file ('" + src + "').";
+					case 2: throw "Error open dest file ('" + dest + "').";
+					case 3: throw "Error get attributes from source file ('" + src + "').";
+					case 4: throw "Error set attributes to dest file ('" + dest + "').";
+					case _: throw "Error code is " + r + ".";
+					
+				}
+			}
+			else
+			{
+				File.copy(src, dest);
 			}
 		}
 		else
