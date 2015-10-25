@@ -99,6 +99,19 @@ Haxelib & HaxeCompiler
 ----------------------
 Helpers to get haxe lib paths & detect/call haxe compiler.
 
+```haxe
+// fast library path detect (run haxelib only once to detect a root path)
+Haxelib.getPath("myLib")
+
+// in regular case return value of the HAXE_STD_PATH
+Haxelib.getStdPath()
+
+// path to compiler executable file
+HaxeCompiler.getPath()
+
+// run compiler with a server support (if port specified)
+HaxeCompiler.run(params, ?port, ?curDir, ?isEcho, ?isVerbose)
+```
 
 Console
 ----------------------
@@ -109,17 +122,3 @@ var name = Console.readLine();
 trace(name);
 
 ```
-
-NdllTools
----------
-A class to find & load *.ndll neko modules. It's like neko.Lib.load(), but with a smart search for module file.
-For example, if you want to load function from module "myModule" on Windows platform:
-```haxe
-var func = NdllTools.load("myModule", "prim", argCount);
-```
-NdllTool.load() test next paths:
-
- * **FOLDER_OF_CURRENT_MODULE** / myModule-windows.ndll
- * **FOLDER_OF_CURRENT_MODULE** / ndll / Windows / myModule.ndll
- * **NEKOPATH** / myModule.ndll
- * **HAXELIBS** / myModule / **VERSION** / ndll/Windows / myModule.ndll (useful if installed same-named haxe library)
