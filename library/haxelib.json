@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko","sys","flashdevelop","log","logging"],
   "description": "Library with ant-like methods. Helpful classes for building console application",
   "contributors": ["yar3333"],
-  "releasenote": "Move NdllTools to the separate library \"dllfinder\".",
-  "version": "3.6.0",
+  "releasenote": "Readme fix.",
+  "version": "3.6.1",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
