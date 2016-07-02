@@ -39,13 +39,14 @@
 #else
 	#include <sys/stat.h>
 	#include <utime.h>
-	#include <stdlib.h>
 	#include <unistd.h>
 #endif
 
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "nekotools.h"
 
 typedef struct {
 #ifdef NEKO_WINDOWS
@@ -113,7 +114,7 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 	val_check(showWindowFlag,int);
 	val_check(useStdHandles,bool);
 #	ifdef NEKO_WINDOWS
-	{		 
+	{
 		SECURITY_ATTRIBUTES sattr;		
 		STARTUPINFO sinf;
 		HANDLE proc = GetCurrentProcess();
@@ -156,8 +157,7 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 			
 			if (!CreateProcess(NULL,val_string(sargs),NULL,NULL,TRUE,0,NULL,NULL,&sinf,&p->pinf))
 			{
-				//printf("CreateProcess error code = %i\n", GetLastError());
-				neko_error();
+				throwNekoException("CreateProcess error code = %i", GetLastError());
 			}
 			
 			// close unused pipes
@@ -169,8 +169,7 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 		{
 			if (!CreateProcess(NULL,val_string(sargs),NULL,NULL,FALSE,0,NULL,NULL,&sinf,&p->pinf))
 			{
-				//printf("CreateProcess error code = %i\n", GetLastError());
-				neko_error();
+				throwNekoException("CreateProcess error code = %i", GetLastError());
 			}
 		}
 	}
@@ -230,10 +229,11 @@ static value process_run( value cmd, value vargs, value showWindowFlag, value us
 	val_check(str,string); \
 	val_check(pos,int); \
 	val_check(len,int); \
-	if( val_int(pos) < 0 || val_int(len) < 0 || val_int(pos) + val_int(len) > val_strlen(str) ) \
-		neko_error(); \
-	p = val_process(vp); \
-
+	if (val_int(pos) < 0 || val_int(len) < 0 || val_int(pos) + val_int(len) > val_strlen(str)) \
+	{ \
+		throwNekoException("Bad argumants"); \
+	} \
+	p = val_process(vp);
 
 /**
 	process_stdout_read : 'process -> buf:string -> pos:int -> len:int -> int
@@ -248,20 +248,25 @@ static value process_stdout_read( value vp, value str, value pos, value len ) {
 #	ifdef NEKO_WINDOWS
 	{
 		DWORD nbytes;
-		if( !ReadFile(p->oread,val_string(str)+val_int(pos),val_int(len),&nbytes,NULL) )
-			neko_error();
+		if (!ReadFile(p->oread,val_string(str)+val_int(pos),val_int(len),&nbytes,NULL))
+		{
+			throwNekoException("ReadFile error code = %i", GetLastError());
+		}
 		return alloc_int(nbytes);
 	}
 #	else
 	int nbytes;
 	POSIX_LABEL(stdout_read_again);
 	nbytes = read(p->oread,val_string(str)+val_int(pos),val_int(len));
-	if( nbytes < 0 ) {
+	if (nbytes < 0)
+	{
 		HANDLE_EINTR(stdout_read_again);
-		neko_error();
+		throwNekoException("read error");
 	}
-	if( nbytes == 0 )
-		neko_error();
+	if (nbytes == 0)
+	{
+		throwNekoException("read error");
+	}
 	return alloc_int(nbytes);
 #	endif
 }
@@ -279,8 +284,10 @@ static value process_stderr_read( value vp, value str, value pos, value len ) {
 #	ifdef NEKO_WINDOWS
 	{
 		DWORD nbytes;
-		if( !ReadFile(p->eread,val_string(str)+val_int(pos),val_int(len),&nbytes,NULL) )
-			neko_error();
+		if (!ReadFile(p->eread,val_string(str)+val_int(pos),val_int(len),&nbytes,NULL))
+		{
+			throwNekoException("ReadFile error code = %i", GetLastError());
+		}
 		return alloc_int(nbytes);
 	}
 #	else
