@@ -5,6 +5,8 @@ import neko.Lib;
 import neko.vm.Thread;
 using StringTools;
 
+class ProcessCreationException extends stdlib.Exception {}
+
 private class Stdin extends haxe.io.Output
 {
 	var p : Dynamic;
@@ -166,7 +168,9 @@ class Process
 
 	public function new(cmd:String, args:Array<String>, showWindowFlag=SW_HIDE, useStdHandles=true) : Void
 	{
-		p = try _run(untyped cmd.__s, neko.Lib.haxeToNeko(args), showWindowFlag, useStdHandles) catch( e : Dynamic ) throw "Process creation failure : "+cmd;
+		try p = _run(untyped cmd.__s, neko.Lib.haxeToNeko(args), showWindowFlag, useStdHandles)
+		catch (e:Dynamic) Lib.rethrow(new ProcessCreationException(Std.string(e)));
+		
 		if (useStdHandles)
 		{
 			stdin = new Stdin(p);
@@ -217,7 +221,7 @@ class Process
 					}
 				}
 			}
-			catch (e:haxe.io.Eof) { }
+			catch (e:haxe.io.Eof) {}
 			output = buffer.toString();
 		});
 		
@@ -243,7 +247,7 @@ class Process
 					}
 				}
 			}
-			catch (e:haxe.io.Eof) { }
+			catch (e:haxe.io.Eof) {}
 			error = buffer.toString();
 		});
 		
