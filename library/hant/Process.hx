@@ -174,7 +174,7 @@ class Process
 		if (useStdHandles)
 		{
 			stdin = new Stdin(p);
-			stdout = new Stdout(p,true);
+			stdout = new Stdout(p, true);
 			stderr = new Stdout(p, false);
 		}
 	}
