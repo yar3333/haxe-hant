@@ -116,7 +116,7 @@ class CmdOptions
 		
 		return s.rtrim() + "\n";
 	}
-
+	
 	public function parse(args:Array<String>) : Map<String,Dynamic>
 	{
 		this.args = args.copy();
@@ -135,7 +135,7 @@ class CmdOptions
 		
 		return params;
 	}
-
+	
 	function parseElement()
 	{
 		var arg = args.shift();
@@ -186,12 +186,12 @@ class CmdOptions
 			case ValueType.TInt:
 				ensureValueExist(s);
 				if (!opt.repeatable) params.set(opt.name, Std.parseInt(args.shift()));
-				else                 params.get(opt.name).push(Std.parseInt(args.shift()));
+				else                 addRepeatableValue(opt.name, Std.parseInt(args.shift()));
 			
 			case ValueType.TFloat:
 				ensureValueExist(s);
 				if (!opt.repeatable) params.set(opt.name, Std.parseFloat(args.shift()));
-				else                 params.get(opt.name).push(Std.parseFloat(args.shift()));
+				else                 addRepeatableValue(opt.name, Std.parseFloat(args.shift()));
 				
 			case ValueType.TBool:
 				params.set(opt.name, !opt.defaultValue);
@@ -201,7 +201,7 @@ class CmdOptions
 				{
 					ensureValueExist(s);
 					if (!opt.repeatable) params.set(opt.name, args.shift());
-					else                 params.get(opt.name).push(args.shift());
+					else                 addRepeatableValue(opt.name, args.shift());
 				}
 				else
 				{
@@ -239,5 +239,11 @@ class CmdOptions
 		
 		throw "Unexpected argument '" + args[0] + "'.";
 		return null;
+	}
+	
+	function addRepeatableValue(name:String, value:Dynamic)
+	{
+		if (params.get(name) == null) params.set(name, []);
+		params.get(name).push(value);
 	}
 }
