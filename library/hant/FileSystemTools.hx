@@ -246,7 +246,7 @@ class FileSystemTools
 		if (verbose) Log.finishSuccess();
 	}
 	
-	#if neko
+	#if (neko && !hant_no_ndll)
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	static function nativeCopyFile(src:String, dest:String)
 	{

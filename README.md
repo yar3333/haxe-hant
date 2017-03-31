@@ -1,14 +1,29 @@
-Ant-like methods primary for haxe sys platforms (neko / php / cpp)
-==================================================================
+Tools primary for console applications (sys platforms: neko/php/cpp)
+====================================================================
 
-Also allow build FlashDevelop haxe projects. For example, to find *.hxproj in current dir and build it run next command:
+Note for `neko` platform
+------------------------
+
+Some classes load `hant.ndll`.
+If you want to be sure about no dependency on `hant.ndll`,
+use `-D hant-no-ndll` in haxe options to skip these classes/methods.
+
+Embedded Commands
+-----------------
+
+Use `haxelib run hant` to get list of commands and `haxelib run hant <command> --help` to get help about command.
+
+`fdbuild`
+
+Allow build FlashDevelop haxe projects.
 ```shell
-haxelib run hant fdbuild 
+# Take *.hxproj from the current dir and build it:
+haxelib run hant fdbuild
 ```
-To get help use "--help" switch:
-```shell
-haxelib run hant fdbuild --help
-```
+
+`path`
+
+Return class paths for the specified haxe libraries. Use `std` as a name of the standard haxe library.
 
 CmdOptions
 ----------

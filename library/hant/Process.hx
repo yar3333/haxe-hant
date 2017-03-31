@@ -1,5 +1,7 @@
 package hant;
 
+#if (neko && !hant_no_ndll)
+
 import haxe.io.Bytes;
 import neko.Lib;
 import neko.vm.Thread;
@@ -280,3 +282,5 @@ class Process
 	static var _kill = Lib.loadLazy("hant","process_kill", 1);
 	static var _run_detached = Lib.loadLazy("hant", "process_run_detached", 2);
 }
+
+#end
