@@ -29,7 +29,7 @@ class CmdOptions
 	var options : Array<Option>;
 	var args : Array<String>;
 	var paramWoSwitchIndex : Int;
-	var params : Map<String,Dynamic>;
+	var params : Map<String, Dynamic>;
 
 	public function new()
 	{
