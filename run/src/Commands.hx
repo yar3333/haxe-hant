@@ -1,7 +1,8 @@
 import hant.CmdOptions;
 import hant.FlashDevelopProject;
 import hant.Haxelib;
-using StringTools;
+import sys.FileSystem;
+using stdlib.StringTools;
 using Lambda;
 
 class Commands
@@ -86,27 +87,121 @@ class Commands
 	{
 		var options = new CmdOptions();
 		
-		options.addRepeatable("libs", String, "Library name. You may specify several libraries.");
+		options.addRepeatable("opts", String, "Library name or *.hxproj file name. You may specify several libraries/projects files.");
 		
-		if (args.length > 0 && args[0] != "--help")
+		if (args.length == 0 || args[0] != "--help")
 		{
 			options.parse(args);
-			var libs : Array<String> = options.get("libs");
-			for (lib in libs)
+			var opts : Array<String> = options.get("opts");
+			
+			if (opts.length == 0) return pathsFromFlashDevelopFile("");
+			
+			for (opt in opts)
 			{
-				var path = Haxelib.getPath(lib);
-				if (path == null) return 1;
-				Sys.println(path);
+				if (opt.endsWith(".hxproj"))
+				{
+					var r = pathsFromFlashDevelopFile(opt);
+					if (r != 0) return r;
+				}
+				else
+				{
+					var path = Haxelib.getPath(opt);
+					if (path == null)
+					{
+						Sys.stderr().writeString("Error detection path for the library '" + opt + "'.\n");
+						return 1;
+					}
+					Sys.println(path);
+				}
 			}
+			
 			return 0;
 		}
 		else
 		{
-			Sys.println("Get class paths of the specified haxe libraries.");
+			Sys.println("Get class paths for the specified haxe libraries or FlashDevelop files.");
 			Sys.println("Use 'std' as library name to get path to standard library.");
-			Sys.println("Usage: haxelib run hant path <library1> [ ... <libraryN>]");
+			Sys.println("If no arguments specifed, then *.hxproj file from the current directory is used.");
+			Sys.println("Usage: haxelib run hant path [ <library_or_project_file1> [ ... <library_or_project_fileN>] ]");
 		}
 		
 		return 1;
 	}
+	
+	function pathsFromFlashDevelopFile(fdProjectFile:String) : Int
+	{
+		if (fdProjectFile != "" && !FileSystem.exists(fdProjectFile))
+		{
+			Sys.stderr().writeString(fdProjectFile != null ? "Project file '" + fdProjectFile + "' is not found.\n" : "Current found don't contains *.hxproj file.\n");
+			return 3;
+		}
+		
+		var project = FlashDevelopProject.load(fdProjectFile);
+		if (project == null) return 2;
+		
+		for (lib in project.libs)
+		{
+			var path = Haxelib.getPath(lib);
+			if (path == null)
+			{
+				Sys.stderr().writeString("Error detection path for the library '" + lib + "'.\n");
+				return 1;
+			}
+			Sys.println(path);
+		}
+		
+		for (path in project.classPaths)
+		{
+			Sys.println(path);
+		}
+		
+		return 0;
+	}
+	
+	public function compilerOptions(args:Array<String>) : Int
+	{
+		var options = new CmdOptions();
+		
+		options.add("project", "", "FlashDevelop *.hxproj file name.");
+		
+		if (args.length == 0 || args[0] != "--help")
+		{
+			options.parse(args);
+			
+			var project = FlashDevelopProject.load(options.get("project"));
+			if (project == null)
+			{
+				Sys.stderr().writeString("Project file is not found.\n");
+				return 2;
+			}
+			
+			var params = new Array<String>();
+			
+			for (name in project.libs) { params.push("-lib"); params.push(name); }
+			for (path in project.classPaths) { params.push("-cp"); params.push(path.rtrim("/")); }
+			
+			for (d in project.directives)
+			{
+				if (d != null && d != "")
+				{
+					params.push("-D"); params.push(d);
+				}
+			}
+			
+			params = params.concat(project.additionalCompilerOptions);
+			
+			Sys.println(params.join("\n"));
+			
+			return 0;
+		}
+		else
+		{
+			Sys.println("Get -lib, -cp, -D and additional haxe compiler options from FlashDevelop file.");
+			Sys.println("If no arguments specifed, then *.hxproj file from the current directory is used.");
+			Sys.println("Usage: haxelib run compiler-options [ <project_file> ]");
+		}
+		
+		return 1;
+	}
+	
 }

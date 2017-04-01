@@ -44,6 +44,9 @@ class Main
 				case "path":
 					Sys.exit(commands.path(args));
 					
+				case "compiler-options":
+					Sys.exit(commands.compilerOptions(args));
+					
 				default:
 					fail("Unknow command.");
 			}
@@ -54,8 +57,9 @@ class Main
 			Sys.println("Usage: haxelib run hant [-v] <command> <args>");
 			Sys.println("where '-v' is the verbose key and <command> may be:");
 			Sys.println("");
-			Sys.println("    fdbuild         Build using FlashDevelop project (*.hxproj).");
-			Sys.println("    path            Get class paths of the specified haxe libraries.");
+			Sys.println("    fdbuild          Build using FlashDevelop project (*.hxproj).");
+			Sys.println("    path             Get class paths for the specified libraries or class paths from FlashDevelop project (*.hxproj).");
+			Sys.println("    compiler-options Get haxe compiler options from specified FlashDevelop project (*.hxproj).");
 			Sys.println("");
 			Sys.println("Type 'haxelib run hant <command> --help' to get help about specified command.");
 		}
