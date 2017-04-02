@@ -162,6 +162,7 @@ class Commands
 	{
 		var options = new CmdOptions();
 		
+		options.add("additional", false, [ "-a", "--additional" ], "Add additional options from *.hxproj file.");
 		options.add("project", "", "FlashDevelop *.hxproj file name.");
 		
 		if (args.length == 0 || args[0] != "--help")
@@ -188,7 +189,10 @@ class Commands
 				}
 			}
 			
-			params = params.concat(project.additionalCompilerOptions);
+			if (options.get("additional"))
+			{
+				params = params.concat(project.additionalCompilerOptions);
+			}
 			
 			Sys.println(params.join("\n"));
 			
@@ -196,9 +200,9 @@ class Commands
 		}
 		else
 		{
-			Sys.println("Get -lib, -cp, -D and additional haxe compiler options from FlashDevelop file.");
+			Sys.println("Get -lib, -cp, -D and optionally additional haxe compiler options from FlashDevelop file.");
 			Sys.println("If no arguments specifed, then *.hxproj file from the current directory is used.");
-			Sys.println("Usage: haxelib run compiler-options [ <project_file> ]");
+			Sys.println("Usage: haxelib run compiler-options [-a] [<project_file>]");
 		}
 		
 		return 1;
