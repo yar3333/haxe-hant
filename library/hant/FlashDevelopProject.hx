@@ -8,6 +8,7 @@ import sys.io.File;
 using stdlib.StringTools;
 
 class AmbiguousProjectFilesException extends Exception {}
+class LibPathNotFoundException extends Exception {}
 
 class FlashDevelopProject 
 {
@@ -25,9 +26,6 @@ class FlashDevelopProject
 	public var preBuildCommand = "";
 	public var postBuildCommand = "";
 	public var alwaysRunPostBuild = false;
-	
-	public var allClassPaths(get, never) : Array<String>;
-	function get_allClassPaths() return [ Haxelib.getStdPath() ].concat(Lambda.array(getLibPaths()).concat(classPaths));
 	
 	public function new() { }
 	
@@ -126,17 +124,24 @@ class FlashDevelopProject
 		return r;
 	}
 	
-	public function getLibPaths() : Map<String, String>
+	public function getAllClassPaths() : Array<String>
 	{
-		var r = new Map<String, String>();
-		for (lib in libs) r.set(lib, Haxelib.getPath(lib));
-		return r;
+		var r = [ Haxelib.getStdPath() ];
+		
+		for (lib in libs)
+		{
+			var path = Haxelib.getPath(lib);
+			if (path == null) throw new LibPathNotFoundException("Path to library '" + lib + "' is not found.");
+			r.push(path);
+		}
+		
+		return r.concat(classPaths);
 	}
 	
 	public function findFile(relativeFilePath:String) : String
 	{
-		var i = allClassPaths.length - 1;
-		while (i >= 0)
+		var allClassPaths = getAllClassPaths();
+		var i = allClassPaths.length - 1; while (i >= 0)
 		{
 			if (FileSystem.exists(Path.join([ allClassPaths[i], relativeFilePath ])))
 			{
