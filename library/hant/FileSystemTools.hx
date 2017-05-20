@@ -246,6 +246,36 @@ class FileSystemTools
 		if (verbose) Log.finishSuccess();
 	}
 	
+	/**
+	 * Find and remove empty directories. Return true if specified base directory was removed.
+	 */
+	public static function removeEmptyDirectories(baseDir:String, removeSelf=false) : Bool
+	{
+		var childCount = 0;
+		
+		for (file in FileSystem.readDirectory(baseDir))
+		{
+			childCount++;
+			
+			var isDir = false;
+			try isDir = FileSystem.isDirectory(baseDir + "/" + file)
+			catch (e:Dynamic) {}
+			
+			if (isDir)
+			{
+				if (removeEmptyDirectories(baseDir + "/" + file, true)) childCount--;
+			}
+		}
+		
+		if (removeSelf && childCount == 0)
+		{
+			FileSystem.deleteDirectory(baseDir);
+			return true;
+		}
+		
+		return false;
+	}
+	
 	#if (neko && !hant_no_ndll)
 	static var copy_file_preserving_attributes : Dynamic->Dynamic->Dynamic;
 	static function nativeCopyFile(src:String, dest:String)
