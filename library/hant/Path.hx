@@ -13,10 +13,13 @@ class Path extends haxe.io.Path
 	public static inline function addTrailingSlash(path:String) : String return haxe.io.Path.addTrailingSlash(path);
 	public static inline function removeTrailingSlashes(path:String) : String return haxe.io.Path.removeTrailingSlashes(path);
 	
+	/**
+	 * Replace `\` to '/' and remove slashes at the end.
+	 */
 	public static function normalize(path:String) : String
 	{
 		path = StringTools.replace(path, "\\", "/");
-		while (path.length > 0 && path.charAt(path.length - 1) == "/") path = path.substr(0, -1);
+		while (path.length > 1 && path.charAt(path.length - 1) == "/") path = path.substr(0, -1);
 		return path;
 	}
 	
