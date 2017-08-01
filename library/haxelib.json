@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko","sys","flashdevelop","log","logging"],
   "description": "Tools primary for console applications (sys platforms: neko/php/cpp).",
   "contributors": ["yar3333"],
-  "releasenote": "CmdOptions: repeatable values bugfix.<br>\nSupport `-D hant-no-ndll` for ensure work without hant.ndll.<br>\nCommand `path` now can accept *.fdproj.<br>\nAdd `compiler-options` command to getting haxe compiler options from *.fdproj<br>\nNo additinal haxe compiler options by default.<br>\nAdd `FileSystemTools.removeEmptyDirectories()`.",
-  "version": "3.7.0",
+  "releasenote": "Path.normalize: don't touch path \"/\".",
+  "version": "3.7.1",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
