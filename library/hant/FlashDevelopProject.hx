@@ -135,7 +135,24 @@ class FlashDevelopProject
 			r.push(path);
 		}
 		
-		return r.concat(classPaths);
+		r = r.concat(classPaths);
+		
+		for (i in 0...additionalCompilerOptions.length)
+		{
+			if (additionalCompilerOptions[i] == "-lib" && i < additionalCompilerOptions.length - 1)
+			{
+				var path = Haxelib.getPath(additionalCompilerOptions[i + 1]);
+				if (path == null) throw new LibPathNotFoundException("Path to library '" + additionalCompilerOptions[i + 1] + "' is not found.");
+				r.push(path);
+			}
+			else
+			if (additionalCompilerOptions[i] == "-cp" && i < additionalCompilerOptions.length - 1)
+			{
+				r.push(additionalCompilerOptions[i + 1]);
+			}
+		}
+		
+		return r;
 	}
 	
 	public function findFile(relativeFilePath:String) : String
