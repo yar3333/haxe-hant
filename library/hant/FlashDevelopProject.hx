@@ -124,9 +124,11 @@ class FlashDevelopProject
 		return r;
 	}
 	
-	public function getAllClassPaths() : Array<String>
+	public function getAllClassPaths(includeStdPath=true) : Array<String>
 	{
-		var r = [ Haxelib.getStdPath() ];
+		var r = [];
+		
+		if (includeStdPath) r.push(Haxelib.getStdPath());
 		
 		for (lib in libs)
 		{
