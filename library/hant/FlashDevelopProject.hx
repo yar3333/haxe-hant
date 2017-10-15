@@ -132,7 +132,7 @@ class FlashDevelopProject
 		
 		for (lib in libs)
 		{
-			var path = Haxelib.getPath(lib);
+			var path = Haxelib.getPath(lib, projectFilePath != null && projectFilePath != "" ? Path.directory(projectFilePath) : null);
 			if (path == null) throw new LibPathNotFoundException("Path to library '" + lib + "' is not found.");
 			r.push(path);
 		}
@@ -143,7 +143,7 @@ class FlashDevelopProject
 		{
 			if (additionalCompilerOptions[i] == "-lib" && i < additionalCompilerOptions.length - 1)
 			{
-				var path = Haxelib.getPath(additionalCompilerOptions[i + 1]);
+				var path = Haxelib.getPath(additionalCompilerOptions[i + 1], projectFilePath != null && projectFilePath != "" ? Path.directory(projectFilePath) : null);
 				if (path == null) throw new LibPathNotFoundException("Path to library '" + additionalCompilerOptions[i + 1] + "' is not found.");
 				r.push(path);
 			}
