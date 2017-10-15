@@ -7,19 +7,16 @@ using stdlib.StringTools;
 
 class Haxelib
 {
-	static var repo : String;
+	static var globalRepoPath : String;
 	static var pathCache = new Map<String, String>();
 	
-	public static function getPath(lib:String) : String
+	public static function getPath(lib:String, ?projectDir:String) : String
 	{
 		if (lib == "std") return getStdPath();
 		
-		if (pathCache.exists(lib)) return pathCache.get(lib);
+		if (pathCache.exists(lib + "|" + projectDir)) return pathCache.get(lib + "|" + projectDir);
 		
-		if (repo == null)
-		{
-			repo = Path.removeTrailingSlashes(Process.run("haxelib", [ "config" ], false, false).output.trim());
-		}
+		var repo = getRepoPath(projectDir);
 		
 		var ver : String = null;
 		if (lib.indexOf(":") >= 0)
@@ -73,5 +70,20 @@ class Haxelib
 		var haxePath = Sys.getEnv("HAXEPATH");
 		if (haxePath != null && haxePath != "") return Path.normalize(Path.join([ haxePath, "std" ]));
 		return Sys.systemName() == "Windows" ? "C:/HaxeToolkit/haxe/std" : "/usr/share/haxe/std";
+	}
+	
+	public static function getRepoPath(?projectDir:String) : String
+	{
+		var localRepoPath = projectDir != null && projectDir != "" ? Path.join([ projectDir, ".haxelib"]) : ".haxelib";
+		return FileSystem.exists(localRepoPath) ? localRepoPath : getGlobalRepoPath();
+	}
+	
+	public static function getGlobalRepoPath() : String
+	{
+		if (globalRepoPath == null)
+		{
+			globalRepoPath = Path.removeTrailingSlashes(Process.run("haxelib", [ "--global", "config" ], false, false).output.trim());
+		}
+		return globalRepoPath;
 	}
 }
