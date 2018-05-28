@@ -4,8 +4,8 @@
   "tags": ["ant","php","neko","sys","flashdevelop","log","logging"],
   "description": "Tools primary for console applications (sys platforms: neko/php/cpp).",
   "contributors": ["yar3333"],
-  "releasenote": "Path.normalize: don't touch path \"/\".",
-  "version": "3.7.1",
+  "releasenote": "Use additional compiler options to detect all classpaths. Ability to not add std path on getAllClassPaths(). Improve local haxelib repo support.",
+  "version": "3.7.2",
   "url": "https://bitbucket.org/yar3333/haxe-hant",
   "dependencies": {"stdlib":""}
 }
