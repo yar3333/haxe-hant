@@ -53,7 +53,6 @@ class Commands
 					if (options.get("mainClass") != "") project.mainClass = options.get("mainClass");
 					if (options.get("noPreBuild")) project.preBuildCommand = "";
 					if (options.get("noPostBuild")) project.postBuildCommand = "";
-					
 					return project.build(addParams, options.get("port"));
 				}
 				else

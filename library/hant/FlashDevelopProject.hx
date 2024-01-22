@@ -1,6 +1,6 @@
 package hant;
 
-import haxe.xml.Fast;
+import haxe.xml.Access;
 import stdlib.Exception;
 import stdlib.Std;
 import sys.FileSystem;
@@ -41,7 +41,7 @@ class FlashDevelopProject
 		if (r.projectFilePath == null) return null;
 		
 		var xml = Xml.parse(File.getContent(r.projectFilePath));
-		var fast = new Fast(xml.firstElement());
+		var fast = new Access(xml.firstElement());
 		
 		if (fast.hasNode.output)
 		{

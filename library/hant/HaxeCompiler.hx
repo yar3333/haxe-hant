@@ -53,5 +53,4 @@ class HaxeCompiler
 		var r = Process.run(getPath(), params, echo, verbose);
 		return r.exitCode;
 	}
-	
 }

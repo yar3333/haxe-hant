@@ -5,7 +5,7 @@ class Main
 {
 	static function main() 
 	{
-        var args = Sys.args();
+		var args = Sys.args();
 		
 		var exeDir = Path.normalize(Sys.getCwd());
 		if (args.length > 0)

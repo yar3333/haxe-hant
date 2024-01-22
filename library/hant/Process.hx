@@ -4,7 +4,7 @@ package hant;
 
 import haxe.io.Bytes;
 import neko.Lib;
-import neko.vm.Thread;
+import sys.thread.Thread;
 using StringTools;
 
 class ProcessCreationException extends stdlib.Exception {}
@@ -170,6 +170,8 @@ class Process
 
 	public function new(cmd:String, args:Array<String>, showWindowFlag=SW_HIDE, useStdHandles=true) : Void
 	{
+		//for (arg in args) Lib.println("Inner arg = " + arg);
+		
 		try p = _run(untyped cmd.__s, neko.Lib.haxeToNeko(args), showWindowFlag, useStdHandles)
 		catch (e:Dynamic) Lib.rethrow(new ProcessCreationException(Std.string(e)));
 		
@@ -276,7 +278,7 @@ class Process
 	}
 	
 	static var _run = Lib.loadLazy("hant","process_run", 4);
-	static var _exit = Lib.loadLazy("hant","process_exit", 1);
+	static var _exit = Lib.loadLazy("hant", "process_exit", 1);
 	static var _pid = Lib.loadLazy("hant","process_pid", 1);
 	static var _close = Lib.loadLazy("hant","process_close", 1);
 	static var _kill = Lib.loadLazy("hant","process_kill", 1);
