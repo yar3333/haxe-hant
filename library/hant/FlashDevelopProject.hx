@@ -1,8 +1,9 @@
 package hant;
 
 import haxe.xml.Access;
-import stdlib.Exception;
+import haxe.Exception;
 import stdlib.Std;
+import stdlib.ExceptionTools;
 import sys.FileSystem;
 import sys.io.File;
 using stdlib.StringTools;
@@ -343,7 +344,7 @@ class FlashDevelopProject
 		catch (e:Dynamic)
 		{
 			if (saveCwd != null) Sys.setCwd(saveCwd);
-			Exception.rethrow(e);
+			ExceptionTools.rethrow(e);
 		}
 		
 		if (saveCwd != null) Sys.setCwd(saveCwd);

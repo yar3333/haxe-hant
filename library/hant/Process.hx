@@ -7,7 +7,7 @@ import neko.Lib;
 import sys.thread.Thread;
 using StringTools;
 
-class ProcessCreationException extends stdlib.Exception {}
+class ProcessCreationException extends haxe.Exception {}
 
 private class Stdin extends haxe.io.Output
 {

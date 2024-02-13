@@ -1,6 +1,7 @@
 package hant;
 
-import stdlib.Exception;
+import haxe.Exception;
+import stdlib.ExceptionTools;
 #if unicode
 import unicode.FileSystem;
 import unicode.File;
@@ -70,7 +71,7 @@ class FileSystemTools
 			catch (message:String)
 			{
 				if (verbose) Log.finishFail(message);
-				Exception.rethrow(message);
+				stdlib.ExceptionTools.rethrow(message);
 			}
 		}
     }
@@ -125,7 +126,7 @@ class FileSystemTools
         catch (message:String)
         {
 			if (verbose) Log.finishFail(message);
-			Exception.rethrow(message);
+			ExceptionTools.rethrow(message);
         }
     }
     
@@ -154,7 +155,7 @@ class FileSystemTools
 			catch (message:String)
 			{
 				if (verbose) Log.finishFail(message);
-				Exception.rethrow(message);
+				ExceptionTools.rethrow(message);
 			}
 		}
     }
@@ -172,7 +173,7 @@ class FileSystemTools
 			catch (message:String)
 			{
 				if (verbose) Log.finishFail(message);
-				Exception.rethrow(message);
+				ExceptionTools.rethrow(message);
 			}
 		}
     }
@@ -241,7 +242,7 @@ class FileSystemTools
 		catch (e:Dynamic)
 		{
 			if (verbose) Log.finishFail();
-			Exception.rethrow(e);
+			ExceptionTools.rethrow(e);
 		}
 		if (verbose) Log.finishSuccess();
 	}

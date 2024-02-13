@@ -1,6 +1,7 @@
 package hant;
-import stdlib.Exception;
 
+import haxe.Exception;
+import stdlib.ExceptionTools;
 using StringTools;
 
 /**
@@ -49,7 +50,7 @@ class Log
 		catch (e:Dynamic)
 		{
 			finishFail();
-			Exception.rethrow(e);
+			ExceptionTools.rethrow(e);
 		}
 		finishSuccess();
 	}
@@ -65,7 +66,7 @@ class Log
 		catch (e:Dynamic)
 		{
 			finishFail();
-			Exception.rethrow(e);
+			ExceptionTools.rethrow(e);
 		}
 		finishSuccess();
 		return r;
